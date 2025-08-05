@@ -1,0 +1,57 @@
+
+    @keyframes colorLoop {
+      0% { color: #ff5e5e; }
+      20% { color: #ffbd4a; }
+      40% { color: #4aff74; }
+      60% { color: #4adfff; }
+      80% { color: #b84aff; }
+      100% { color: #ff5e5e; }
+    }
+
+    .color-animation {
+      animation: colorLoop 5s infinite linear;
+      transition: all 0.3s ease-in-out;
+    }
+@keyframes fadeInDown {
+            from {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+ @keyframes glow {
+            0% {
+              text-shadow: 0 0 5px #3b82f6, 0 0 10px #06b6d4;
+            }
+            100% {
+              text-shadow: 0 0 15px #3b82f6, 0 0 30px #06b6d4;
+            }
+          }
+
+          @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeIn {
+          0% { opacity: 0 }
+          100% { opacity: 1 }
+        }

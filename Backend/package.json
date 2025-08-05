@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Node.js backend for your project",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "test": "node tests/test-backend.js",
+    "test:admin": "node tests/test-admin-login.js",
+    "test:admin-panel": "node tests/test-admin-panel.js",
+    "test:remove": "node tests/test-remove.js",
+    "test:upload": "node tests/test-upload.js",
+    "test:image-upload": "node tests/test-image-upload.js",
+    "test:order": "node tests/test-order-page.js",
+    "test:admin-func": "node tests/test-admin.js",
+    "test:comprehensive": "node tests/run-all-tests.js",
+    "test:all": "npm run test && npm run test:admin && npm run test:upload && npm run test:order && npm run test:admin-func"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.0",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
+    "stripe": "^18.4.0",
+    "validator": "^13.15.15"
+  }
+}
