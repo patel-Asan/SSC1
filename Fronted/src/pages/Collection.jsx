@@ -171,7 +171,12 @@ const Collection = () => {
             filterProducts.map((item, index) => (
               <div
                 key={item._id || index}
-                style={{ backgroundColor: "#fff", padding: "1rem", borderRadius: "0.75rem", boxShadow: "0 4px 12px rgba(0,0,0,0.05)", transition: "all 0.3s ease" }}
+                style={{ background: "#fff",
+                padding: "12px",
+                borderRadius: "16px",
+                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+                transition: "transform 0.3s ease-in-out",
+                cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.05)", transition: "all 0.3s ease" }}
               >
                 <Productitem
                   id={item._id}

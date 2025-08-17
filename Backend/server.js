@@ -71,17 +71,19 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
+
 const startServer = async () => {
-  try {
-    console.log('🚀 Starting E-commerce Backend Server...');
-    await connectDB();
-    app.listen(port, () => {
-      console.log(`✅ Server running on http://localhost:${port}`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
-    process.exit(1);
-  }
+  console.log('🚀 Starting E-commerce Backend Server...');
+  await connectDB();
 };
 
 startServer();
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`✅ Server running on http://localhost:${port}`);
+  });
+}
+
+
+
