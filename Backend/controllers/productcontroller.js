@@ -100,10 +100,22 @@ const addProduct = async (req, res) => {
 const listProduct = async (req, res) => {
     try {
         const products = await productModel.find().sort({ date: -1 });
+        
+        const normalizedProducts = products.map(p => {
+            const obj = p.toObject();
+            if (typeof obj.image === 'string') {
+                obj.image = obj.image.split(',').filter(Boolean);
+            }
+            if (!Array.isArray(obj.image)) {
+                obj.image = [];
+            }
+            return obj;
+        });
+        
         res.status(200).json({ 
             success: true, 
-            products,
-            count: products.length 
+            products: normalizedProducts,
+            count: normalizedProducts.length 
         });
     } catch (error) {
         console.error("List products error:", error);
@@ -159,7 +171,7 @@ const removeProduct = async (req, res) => {
 // Function to get a single product by ID
 const SingleProduct = async (req, res) => {
     try {
-        const { id } = req.body; // Changed from req.params to req.body
+        const { id } = req.body;
 
         if (!id) {
             return res.status(400).json({ 
@@ -177,9 +189,17 @@ const SingleProduct = async (req, res) => {
             });
         }
         
+        const obj = product.toObject();
+        if (typeof obj.image === 'string') {
+            obj.image = obj.image.split(',').filter(Boolean);
+        }
+        if (!Array.isArray(obj.image)) {
+            obj.image = [];
+        }
+        
         res.status(200).json({ 
             success: true, 
-            product 
+            product: obj 
         });
     } catch (error) {
         console.error("Get single product error:", error);
