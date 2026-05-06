@@ -5,7 +5,9 @@ import {
   placeOrderRazorpay,
   allOrders,
   userOrders,
-  updateStatus
+  updateStatus,
+  trackOrder,
+  getOrderByTrackingId
 } from '../controllers/ordercontroller.js';
 
 import adminAuth from '../middleware/adminAuth.js';  // ✅ Fixed spacing and path
@@ -24,5 +26,9 @@ orderRouter.post('/razorpay', verifyToken, placeOrderRazorpay);
 
 // ✅ User Route
 orderRouter.post('/userorders', verifyToken, userOrders);
+
+// ✅ Order Tracking Routes
+orderRouter.get('/track/:orderId', verifyToken, trackOrder);
+orderRouter.get('/track-public/:trackingId', getOrderByTrackingId);
 
 export default orderRouter;

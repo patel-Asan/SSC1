@@ -1,155 +1,398 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { assets } from "../assets/assets";
-import './app1.css';
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Footer = () => {
-  const [animate, setAnimate] = useState(false);
+  const socialLinks = [
+    { name: "Facebook", icon: "📘", url: "#" },
+    { name: "Instagram", icon: "📸", url: "#" },
+    { name: "Twitter", icon: "🐦", url: "#" },
+    { name: "YouTube", icon: "📺", url: "#" },
+  ];
 
-  useEffect(() => {
-    // Trigger animation on mount
-    setAnimate(true);
-  }, []);
-
-  // Keyframe styles
-  const fadeInUp = {
-    animation: animate ? "fadeInUp 0.8s ease forwards" : "none",
-    opacity: 0,
-    transform: "translateY(30px)",
-  };
-
-  const containerStyle = {
-    fontFamily: "Segoe UI, Roboto, sans-serif",
-    padding: "40px 20px",
-    maxWidth: "1280px",
-    margin: "0 auto",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "40px",
-  };
-
-  const rowStyle = {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "24px",
-    width: "100%",
-  };
-
-  const cardStyle = {
-    ...fadeInUp,
-    flex: "1 1 300px",
-    backgroundColor: "#ffffff",
-    borderRadius: "16px",
-    padding: "24px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-    transition: "transform 0.3s ease",
-    textAlign: "left",
-  };
-
-  const logoStyle = {
-    width: "120px",
-    height: "120px",
-    marginBottom: "16px",
-    transition: "transform 0.5s ease",
-    cursor: "pointer",
-  };
-
-  const headingStyle = {
-    fontSize: "20px",
-    fontWeight: "700",
-    marginBottom: "14px",
-    color: "#111",
-  };
-
-  const paragraphStyle = {
-    fontSize: "15px",
-    color: "#555",
-    lineHeight: "1.6",
-    letterSpacing: "0.3px",
-    marginTop: "6px",
-    textAlign: "justify",
-  };
-
-  const linkStyle = {
-    fontSize: "14px",
-    color: "#444",
-    marginBottom: "10px",
-    cursor: "pointer",
-    transition: "color 0.3s ease",
+  const footerLinks = {
+    company: [
+      { name: "About Us", path: "/about" },
+      { name: "Our Story", path: "/about" },
+      { name: "Careers", path: "#" },
+      { name: "Press & Media", path: "#" },
+    ],
+    customer: [
+      { name: "Contact Us", path: "/contact" },
+      { name: "FAQs", path: "#" },
+      { name: "Shipping Info", path: "#" },
+      { name: "Returns & Exchange", path: "#" },
+    ],
+    legal: [
+      { name: "Privacy Policy", path: "#" },
+      { name: "Terms of Service", path: "#" },
+      { name: "Cookie Policy", path: "#" },
+    ],
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={rowStyle}>
-        {/* Logo + Description */}
-        <div style={cardStyle}>
-          <img
-            src={assets.logo}
-            alt="Logo"
-            style={logoStyle}
-            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.1) rotate(2deg)")}
-            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1) rotate(0deg)")}
-          />
-          <p style={paragraphStyle}>
-            Discover timeless elegance with Surat Sari Center. Quality fabrics,
-            traditional charm, and modern design — all in one place.
-          </p>
+    <motion.footer
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      style={{
+        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+        color: "#fff",
+        fontFamily: "'Inter', sans-serif",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Decorative Elements */}
+      <div style={{
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        height: "1px",
+        background: "linear-gradient(90deg, transparent, #ff6f61, transparent)",
+      }} />
+
+      {/* Main Footer Content */}
+      <div style={{
+        maxWidth: "1400px",
+        margin: "0 auto",
+        padding: "80px 40px 40px",
+      }}>
+        {/* Links Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "60px",
+          marginBottom: "60px",
+        }}>
+          {/* Brand Column */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            style={{ minWidth: "250px" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+              <img
+                src={assets.logo}
+                alt="SSC Logo"
+                style={{ 
+                  width: "55px", 
+                  height: "55px",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 15px rgba(255, 111, 97, 0.3)",
+                }}
+              />
+              <div>
+                <span style={{
+                  fontSize: "22px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  display: "block",
+                }}>
+                  SSC
+                </span>
+                <span style={{
+                  fontSize: "11px",
+                  color: "#9ca3af",
+                  letterSpacing: "1px",
+                }}>
+                  SURAT SARI CENTRE
+                </span>
+              </div>
+            </div>
+            <p style={{
+              fontSize: "14px",
+              color: "#9ca3af",
+              lineHeight: "1.8",
+              marginBottom: "24px",
+            }}>
+              Discover timeless elegance with Surat Sari Center. Quality fabrics, traditional charm, and modern design.
+            </p>
+            {/* Social Icons */}
+            <div style={{ display: "flex", gap: "12px" }}>
+              {socialLinks.map((social, i) => (
+                <motion.a
+                  key={social.name}
+                  href={social.url}
+                  whileHover={{ scale: 1.15, y: -3 }}
+                  whileTap={{ scale: 0.9 }}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = "rgba(255, 111, 97, 0.2)";
+                    e.target.style.borderColor = "#ff6f61";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                    e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                  }}
+                >
+                  {social.icon}
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Company Links */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <h4 style={{
+              fontSize: "16px",
+              fontWeight: "700",
+              marginBottom: "20px",
+              color: "#fff",
+              letterSpacing: "0.5px",
+            }}>
+              COMPANY
+            </h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              {footerLinks.company.map((link, i) => (
+                <motion.div key={i} whileHover={{ x: 5 }}>
+                  <Link
+                    to={link.path}
+                    style={{
+                      fontSize: "14px",
+                      color: "#9ca3af",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = "#ff6f61";
+                      e.target.querySelector(".arrow").style.opacity = "1";
+                      e.target.querySelector(".arrow").style.transform = "translateX(0)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = "#9ca3af";
+                      e.target.querySelector(".arrow").style.opacity = "0";
+                      e.target.querySelector(".arrow").style.transform = "translateX(-5px)";
+                    }}
+                  >
+                    <span className="arrow" style={{ opacity: "0", transform: "translateX(-5px)", transition: "all 0.3s ease" }}>›</span>
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Customer Service */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            <h4 style={{
+              fontSize: "16px",
+              fontWeight: "700",
+              marginBottom: "20px",
+              color: "#fff",
+              letterSpacing: "0.5px",
+            }}>
+              CUSTOMER SERVICE
+            </h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              {footerLinks.customer.map((link, i) => (
+                <motion.div key={i} whileHover={{ x: 5 }}>
+                  <Link
+                    to={link.path}
+                    style={{
+                      fontSize: "14px",
+                      color: "#9ca3af",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.color = "#ff6f61";
+                      e.target.querySelector(".arrow").style.opacity = "1";
+                      e.target.querySelector(".arrow").style.transform = "translateX(0)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.color = "#9ca3af";
+                      e.target.querySelector(".arrow").style.opacity = "0";
+                      e.target.querySelector(".arrow").style.transform = "translateX(-5px)";
+                    }}
+                  >
+                    <span className="arrow" style={{ opacity: "0", transform: "translateX(-5px)", transition: "all 0.3s ease" }}>›</span>
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Contact Info */}
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+          >
+            <h4 style={{
+              fontSize: "16px",
+              fontWeight: "700",
+              marginBottom: "20px",
+              color: "#fff",
+              letterSpacing: "0.5px",
+            }}>
+              CONTACT US
+            </h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {[
+                { icon: "📞", label: "Phone", value: "+91 98765 43210" },
+                { icon: "✉️", label: "Email", value: "support@ssc.com" },
+                { icon: "📍", label: "Address", value: "123 Textile Market, Surat, Gujarat 395001" },
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ x: 5 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                  }}
+                >
+                  <span style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "10px",
+                    background: "rgba(255, 111, 97, 0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    flexShrink: "0",
+                  }}>
+                    {item.icon}
+                  </span>
+                  <div>
+                    <p style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      margin: "0 0 2px 0",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                    }}>
+                      {item.label}
+                    </p>
+                    <p style={{
+                      fontSize: "14px",
+                      color: "#e5e7eb",
+                      margin: 0,
+                      fontWeight: "500",
+                    }}>
+                      {item.value}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Company Links */}
-        <div style={cardStyle}>
-          <h3 style={headingStyle}>Company</h3>
-          <div>
-            {["Home", "About", "Delivery", "Privacy Policy"].map((link, i) => (
+        {/* Payment Methods */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+            padding: "30px 0",
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            marginBottom: "30px",
+          }}
+        >
+          <span style={{ fontSize: "13px", color: "#6b7280" }}>We Accept:</span>
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            {["💳 Visa", "💳 Mastercard", "📱 UPI", "💰 COD"].map((method, i) => (
               <div
                 key={i}
                 style={{
-                  ...linkStyle,
-                  transition: "all 0.3s ease",
+                  padding: "8px 16px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  color: "#9ca3af",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.color = "#000")}
-                onMouseOut={(e) => (e.currentTarget.style.color = "#444")}
               >
-                {link}
+                {method}
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Contact Info */}
-        <div style={cardStyle}>
-          <h3 style={headingStyle}>Get In Touch!</h3>
-          <div>
-            <div style={linkStyle}>📞 0123456789</div>
-            <div style={linkStyle}>📧 contact@ssc.com</div>
+        {/* Bottom Bar */}
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "20px",
+        }}>
+          <p style={{
+            fontSize: "13px",
+            color: "#6b7280",
+            margin: 0,
+          }}>
+            © 2024 <span style={{ color: "#ff6f61", fontWeight: "600" }}>Surat Sari Centre</span>. All Rights Reserved.
+          </p>
+          <div style={{ display: "flex", gap: "24px" }}>
+            {footerLinks.legal.map((link, i) => (
+              <Link
+                key={i}
+                to={link.path}
+                style={{
+                  fontSize: "13px",
+                  color: "#6b7280",
+                  textDecoration: "none",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseEnter={(e) => e.target.style.color = "#ff6f61"}
+                onMouseLeave={(e) => e.target.style.color = "#6b7280"}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* Bottom Copy */}
-      <div
-  style={{
-    fontSize: "14px",
-    color: "#555",
-    background: "linear-gradient(90deg, #f5f5f5, #fafafa)",
-    padding: "16px 12px",
-    borderTop: "1px solid #ddd",
-    textAlign: "center",
-    fontWeight: "500",
-    letterSpacing: "0.3px",
-    boxShadow: "0 -2px 6px rgba(0,0,0,0.04)",
-    transition: "all 0.4s ease",
-    animation: "fadeIn 1s ease forwards",
-    opacity: 0,
-  }}
->
-  &copy; 2024 <span style={{ fontWeight: "600", color: "#222" }}>Surat Sari Center.com</span> — All Rights Reserved
-</div>
-
-   
-    
-    </div>
+    </motion.footer>
   );
 };
 

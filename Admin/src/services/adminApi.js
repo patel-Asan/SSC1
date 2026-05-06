@@ -37,44 +37,103 @@ class AdminApiService {
     }
   }
 
-  // Dashboard - Use existing endpoints for now
+  // Dashboard - Fetch real data from backend
   async getDashboardStats() {
-    // For now, return mock data since the new admin endpoints aren't fully implemented
-    return {
-      success: true,
-      data: {
-        totalUsers: 0,
-        totalProducts: 0,
-        totalOrders: 0,
-        totalRevenue: 0,
-        monthlyOrders: 0,
-        monthlyRevenue: 0,
-        recentOrders: []
+    try {
+      const response = await fetch(`${this.baseURL}/api/admin/dashboard`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      console.log('📊 Dashboard API response:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch dashboard stats');
       }
-    };
+      
+      return {
+        success: true,
+        data: data.data
+      };
+    } catch (error) {
+      console.error('Dashboard stats error:', error);
+      // Return mock data if API fails
+      return {
+        success: true,
+        data: {
+          totalUsers: 0,
+          totalProducts: 0,
+          totalOrders: 0,
+          totalRevenue: 0,
+          monthlyOrders: 0,
+          monthlyRevenue: 0,
+          recentOrders: []
+        }
+      };
+    }
   }
 
-  // User Management - Use existing endpoints
+  // User Management
   async getAllUsers() {
-    // For now, return empty array since user management needs to be implemented
-    return {
-      success: true,
-      data: []
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/admin/users`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return {
+        success: data.success,
+        data: data.users || []
+      };
+    } catch (error) {
+      console.error('Get users error:', error);
+      throw error;
+    }
   }
 
   async updateUserStatus(userId, status) {
-    return {
-      success: true,
-      message: "User status updated successfully"
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/admin/users/${userId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        },
+        body: JSON.stringify({ status })
+      });
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Update user status error:', error);
+      throw error;
+    }
   }
 
   async deleteUser(userId) {
-    return {
-      success: true,
-      message: "User deleted successfully"
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Delete user error:', error);
+      throw error;
+    }
   }
 
   // Order Management - Use existing endpoints
@@ -119,39 +178,89 @@ class AdminApiService {
     }
   }
 
-  // Analytics - Mock data for now
+  // Analytics
   async getOrderAnalytics(period = 'month') {
-    return {
-      success: true,
-      data: []
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/analytics/orders?period=${period}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return {
+        success: data.success,
+        data: data.data || []
+      };
+    } catch (error) {
+      console.error('Order analytics error:', error);
+      return { success: false, data: [] };
+    }
   }
 
   async getProductAnalytics() {
-    return {
-      success: true,
-      data: {
-        topProducts: [],
-        categoryStats: []
-      }
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/analytics/products`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return {
+        success: data.success,
+        data: data.data || { topProducts: [], categoryStats: [] }
+      };
+    } catch (error) {
+      console.error('Product analytics error:', error);
+      return { success: false, data: { topProducts: [], categoryStats: [] } };
+    }
   }
 
   async getSalesReport(startDate, endDate) {
-    return {
-      success: true,
-      data: []
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/analytics/sales?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return {
+        success: data.success,
+        data: data.data || []
+      };
+    } catch (error) {
+      console.error('Sales report error:', error);
+      return { success: false, data: [] };
+    }
   }
 
   async getInventoryStatus() {
-    return {
-      success: true,
-      data: {
-        inventoryStats: [],
-        lowStockProducts: []
-      }
-    };
+    try {
+      const response = await fetch(`${this.baseURL}/api/analytics/inventory`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': localStorage.getItem('token')
+        }
+      });
+      
+      const data = await response.json();
+      return {
+        success: data.success,
+        data: data.data || { inventoryStats: [], lowStockProducts: [] }
+      };
+    } catch (error) {
+      console.error('Inventory status error:', error);
+      return { success: false, data: { inventoryStats: [], lowStockProducts: [] } };
+    }
   }
 
   // Product Management (existing functionality)

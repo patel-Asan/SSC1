@@ -1,79 +1,82 @@
 
-
 import React, { useContext, useEffect, useState } from "react";
 import { Shopcontext } from "../context/shopcontext";
 import Title from "./title";
+import { motion } from "framer-motion";
 
 const CartTotal = ({ hideCheckout }) => {
-  const { currency, delivery_fee, getCartAmount, navigate} = useContext(Shopcontext);
+  const { currency, delivery_fee, getCartAmount, navigate, discount } = useContext(Shopcontext);
   const subtotal = getCartAmount();
-  const total = subtotal === 0 ? 0 : subtotal + delivery_fee;
-
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setIsVisible(true), 100);
-  }, []);
+  const afterDiscount = subtotal - discount;
+  const total = subtotal === 0 ? 0 : afterDiscount + delivery_fee;
 
   return (
-    <div
-      className={`w-full max-w-lg mx-auto p-4 sm:p-6 md:p-8 rounded-2xl 
-        ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"} 
-        transition-all duration-700 ease-out shadow-xl hover:shadow-2xl 
-        hover:scale-[1.015]`}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       style={{
-        backgroundColor: "#f1f5f9", // Box background color
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        color: "#1e293b",
-        border: "3px solid black", // ✅ 3px black border applied
+        backgroundColor: "#fff",
+        padding: "32px",
+        borderRadius: "24px",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+        border: "1px solid #f3f4f6",
       }}
     >
-      {/* Title */}
-      <div
-        className="text-xl sm:text-2xl font-extrabold mb-4 sm:mb-6 tracking-wide"
-        style={{
-          color: "#3b82f6",
-          fontFamily: "'Poppins', sans-serif",
-        }}
-      >
-        <Title text1="&nbsp;&nbsp;&nbsp;&nbsp;CART_" text2="TOTAL" />
+      <Title text1="CART_" text2="TOTAL" />
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px" }}>
+          <span style={{ color: "#6b7280" }}>Subtotal</span>
+          <span style={{ fontWeight: "600", color: "#1f2937" }}>{currency}{subtotal.toFixed(2)}</span>
+        </div>
+        <hr style={{ border: "none", borderTop: "1px solid #f3f4f6" }} />
+        
+        {discount > 0 && (
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px" }}>
+              <span style={{ color: "#166534", fontWeight: "600" }}>Discount</span>
+              <span style={{ fontWeight: "700", color: "#166534" }}>-{currency}{discount.toFixed(2)}</span>
+            </div>
+            <hr style={{ border: "none", borderTop: "1px solid #f3f4f6" }} />
+          </>
+        )}
+        
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px" }}>
+          <span style={{ color: "#6b7280" }}>Shipping Fee</span>
+          <span style={{ fontWeight: "600", color: "#1f2937" }}>{currency}{delivery_fee.toFixed(2)}</span>
+        </div>
+        <hr style={{ border: "none", borderTop: "2px solid #1f2937" }} />
+        
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "18px", fontWeight: "700" }}>
+          <span style={{ color: "#1f2937" }}>Total</span>
+          <span style={{ color: "#ff6f61" }}>{currency}{total.toFixed(2)}</span>
+        </div>
       </div>
 
-      {/* Totals */}
-      <div className="flex flex-col gap-4 text-sm sm:text-base">
-        <div className="flex justify-between">
-          <span className="text-slate-600">&nbsp;&nbsp;&nbsp;&nbsp;Subtotal</span>
-          <span className="font-semibold">{currency}{subtotal}.00&nbsp;&nbsp;</span>
-        </div>
-        <hr className="border-slate-300" />
-
-        <div className="flex justify-between">
-          <span className="text-slate-600">&nbsp;&nbsp;&nbsp;&nbsp;Shipping Fee</span>
-          <span className="font-semibold">{currency}{delivery_fee}&nbsp;&nbsp;</span>
-        </div>
-        <hr className="border-slate-300" />
-
-        <div className="flex justify-between text-lg font-bold mt-2 text-blue-700">
-          <span>&nbsp;&nbsp;&nbsp;&nbsp;Total</span>
-          <span>{currency}{total}&nbsp;&nbsp;</span>
-        </div>
-      </div>
-<br></br>
-      {/* Box Button */}
       {!hideCheckout && subtotal > 0 && (
-        <div className="mt-6">
-          <button onClick={()=>navigate('/placeorder')}
-            className="w-full py-3 px-6 rounded-xl font-semibold shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-center text-white"
-            style={{
-              backgroundColor: "#3b82f6", 
-              height:'30px'// blue
-            }}
-          >
-            Proceed to Checkout
-          </button>
-        </div>
+        <motion.button
+          onClick={() => navigate('/placeorder')}
+          whileHover={{ scale: 1.02, boxShadow: "0 8px 25px rgba(255,111,97,0.3)" }}
+          whileTap={{ scale: 0.98 }}
+          style={{
+            width: "100%",
+            padding: "18px",
+            backgroundColor: "#ff6f61",
+            color: "#fff",
+            border: "none",
+            borderRadius: "14px",
+            fontSize: "16px",
+            fontWeight: "700",
+            cursor: "pointer",
+            boxShadow: "0 4px 15px rgba(255,111,97,0.2)",
+            transition: "all 0.3s ease",
+          }}
+        >
+          Proceed to Checkout →
+        </motion.button>
       )}
-    </div>
+    </motion.div>
   );
 };
 

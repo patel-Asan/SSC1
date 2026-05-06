@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { currency } from "../App";
-import { Search, Filter, RefreshCw, Eye, Edit, Calendar, User, DollarSign, Package } from "lucide-react";
+import { Search, Filter, RefreshCw, Eye, Edit3, Calendar, User, DollarSign, Package, ShoppingBag, Truck, CheckCircle, XCircle, Clock, ChevronDown, Download } from "lucide-react";
 
 const Orders = ({ token }) => {
     const [orders, setOrders] = useState([]);
@@ -12,6 +12,7 @@ const Orders = ({ token }) => {
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage] = useState(10);
+    const isMobile = window.innerWidth <= 768;
 
     const fetchAllOrders = async () => {
         if (!token) {
@@ -46,6 +47,33 @@ const Orders = ({ token }) => {
     useEffect(() => {
         fetchAllOrders();
     }, [token]);
+
+    const handleExportOrders = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/export/orders`, {
+                method: 'GET',
+                headers: { 'token': token }
+            });
+            
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                toast.success("Orders exported successfully");
+            } else {
+                toast.error("Failed to export orders");
+            }
+        } catch (error) {
+            console.error('Error exporting orders:', error);
+            toast.error("Failed to export orders");
+        }
+    };
 
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
@@ -90,21 +118,44 @@ const Orders = ({ token }) => {
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
     const statusBadgeStyle = (status) => ({
-        padding: "6px 12px",
+        padding: "8px 16px",
         borderRadius: "20px",
-        fontSize: "0.75rem",
-        fontWeight: "600",
+        fontSize: "0.8rem",
+        fontWeight: "700",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
         backgroundColor: 
-            status === 'Delivered' ? "#dcfce7" :
-            status === 'Shipped' ? "#dbeafe" :
-            status === 'Processing' ? "#fef3c7" :
-            status === 'Cancelled' ? "#fee2e2" : "#f3f4f6",
+            status === 'Delivered' ? "rgba(16,185,129,0.1)" :
+            status === 'Shipped' ? "rgba(59,130,246,0.1)" :
+            status === 'Processing' ? "rgba(245,158,11,0.1)" :
+            status === 'Cancelled' ? "rgba(239,68,68,0.1)" :
+            status === 'Order Placed' ? "rgba(139,92,246,0.1)" : "rgba(107,114,128,0.1)",
         color: 
-            status === 'Delivered' ? "#166534" :
-            status === 'Shipped' ? "#1e40af" :
-            status === 'Processing' ? "#92400e" :
-            status === 'Cancelled' ? "#dc2626" : "#374151"
+            status === 'Delivered' ? "#10b981" :
+            status === 'Shipped' ? "#3b82f6" :
+            status === 'Processing' ? "#f59e0b" :
+            status === 'Cancelled' ? "#ef4444" :
+            status === 'Order Placed' ? "#8b5cf6" : "#6b7280",
+        border: `2px solid ${
+            status === 'Delivered' ? "rgba(16,185,129,0.2)" :
+            status === 'Shipped' ? "rgba(59,130,246,0.2)" :
+            status === 'Processing' ? "rgba(245,158,11,0.2)" :
+            status === 'Cancelled' ? "rgba(239,68,68,0.2)" :
+            status === 'Order Placed' ? "rgba(139,92,246,0.2)" : "rgba(107,114,128,0.2)"
+        }`
     });
+
+    const getStatusIcon = (status) => {
+        switch(status) {
+            case 'Delivered': return <CheckCircle size={14} />;
+            case 'Shipped': return <Truck size={14} />;
+            case 'Processing': return <Clock size={14} />;
+            case 'Cancelled': return <XCircle size={14} />;
+            case 'Order Placed': return <ShoppingBag size={14} />;
+            default: return <Package size={14} />;
+        }
+    };
 
     const cardStyle = {
         backgroundColor: "#ffffff",
@@ -207,65 +258,160 @@ const Orders = ({ token }) => {
         }
     `;
 
+    // Calculate order stats
+    const orderStats = {
+        total: orders.length,
+        placed: orders.filter(o => o.status === 'Order Placed').length,
+        processing: orders.filter(o => o.status === 'Processing').length,
+        shipped: orders.filter(o => o.status === 'Shipped').length,
+        delivered: orders.filter(o => o.status === 'Delivered').length,
+        cancelled: orders.filter(o => o.status === 'Cancelled').length,
+        revenue: orders.filter(o => o.status === 'Delivered').reduce((sum, o) => sum + (o.amount || 0), 0)
+    };
+
     return (
-        <div style={{ padding: '20px', backgroundColor: '#f8fafc', minHeight: '100vh' }}>
+        <div style={{ padding: isMobile ? "16px" : "32px", backgroundColor: '#f9fafb', minHeight: '100vh' }}>
             {/* Add CSS animations */}
             <style>{animationStyles}</style>
             
-            {/* Header */}
+            {/* Premium Header Card */}
             <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "2rem",
-                flexWrap: "wrap",
-                gap: "16px"
+                background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+                borderRadius: isMobile ? "12px" : "20px",
+                padding: isMobile ? "16px" : "28px",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
+                border: "1px solid #f3f4f6",
+                marginBottom: isMobile ? "16px" : "24px"
             }}>
-                <div>
-                    <h1 style={{ 
-                        fontSize: "2.25rem", 
-                        fontWeight: "700",
-                        color: "#111827",
-                        margin: 0,
-                        marginBottom: "8px"
-                    }}>
-                        Order Management
-                    </h1>
-                    <p style={{ color: "#6b7280", margin: 0 }}>
-                        {filteredOrders.length} orders found
-                    </p>
-                </div>
-                
-                <button
-                    onClick={fetchAllOrders}
-                    className="button-hover"
-                    style={{
-                        backgroundColor: "#3b82f6",
-                        color: "white",
-                        border: "none",
-                        padding: "12px 20px",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        fontSize: "0.875rem",
-                        fontWeight: "500",
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+                    <div style={{
+                        width: isMobile ? "36px" : "44px",
+                        height: isMobile ? "36px" : "44px",
+                        borderRadius: "12px",
+                        background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
                         display: "flex",
                         alignItems: "center",
-                        gap: "8px"
-                    }}
-                >
-                    <RefreshCw size={16} />
-                    Refresh
-                </button>
+                        justifyContent: "center",
+                        color: "white",
+                    }}>
+                        <ShoppingBag size={isMobile ? 18 : 24} />
+                    </div>
+                    <div>
+                        <h1 style={{ 
+                            fontSize: isMobile ? "1.25rem" : "1.5rem", 
+                            fontWeight: "800",
+                            color: "#1f2937",
+                            margin: "0 0 4px 0"
+                        }}>
+                            Order Management
+                        </h1>
+                        <p style={{ margin: 0, fontSize: isMobile ? "12px" : "14px", color: "#6b7280" }}>
+                            {filteredOrders.length} orders • {currency}{orderStats.revenue.toFixed(2)} revenue
+                        </p>
+                    </div>
+                </div>
+
+                {/* Stats Cards */}
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(auto-fit, minmax(140px, 1fr))",
+                    gap: isMobile ? "10px" : "16px",
+                    marginBottom: "24px"
+                }}>
+                    {[
+                        { label: "Total", value: orderStats.total, color: "#6b7280", bg: "rgba(107,114,128,0.1)" },
+                        { label: "Placed", value: orderStats.placed, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+                        { label: "Processing", value: orderStats.processing, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+                        { label: "Shipped", value: orderStats.shipped, color: "#3b82f6", bg: "rgba(59,130,246,0.1)" },
+                        { label: "Delivered", value: orderStats.delivered, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+                        { label: "Cancelled", value: orderStats.cancelled, color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+                    ].map((stat, idx) => (
+                        <div key={idx} style={{
+                            background: stat.bg,
+                            borderRadius: "12px",
+                            padding: isMobile ? "12px" : "16px",
+                            textAlign: "center",
+                            border: `2px solid ${stat.bg}`,
+                            transition: "all 0.3s ease"
+                        }}>
+                            <div style={{ fontSize: isMobile ? "1.25rem" : "1.5rem", fontWeight: "800", color: stat.color, marginBottom: "4px" }}>
+                                {stat.value}
+                            </div>
+                            <div style={{ fontSize: isMobile ? "10px" : "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                                {stat.label}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                
+                <div style={{ display: "flex", gap: "12px" }}>
+                    <button
+                        onClick={fetchAllOrders}
+                        style={{
+                            background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                            color: "white",
+                            border: "none",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            boxShadow: "0 4px 15px rgba(139,92,246,0.3)",
+                            transition: "all 0.3s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.transform = "translateY(-2px)";
+                            e.target.style.boxShadow = "0 6px 20px rgba(139,92,246,0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.transform = "translateY(0)";
+                            e.target.style.boxShadow = "0 4px 15px rgba(139,92,246,0.3)";
+                        }}
+                    >
+                        <RefreshCw size={18} /> Refresh Orders
+                    </button>
+                    <button
+                        onClick={handleExportOrders}
+                        style={{
+                            background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
+                            color: "white",
+                            border: "none",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            boxShadow: "0 4px 15px rgba(16,185,129,0.3)",
+                            transition: "all 0.3s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.transform = "translateY(-2px)";
+                            e.target.style.boxShadow = "0 6px 20px rgba(16,185,129,0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.transform = "translateY(0)";
+                            e.target.style.boxShadow = "0 4px 15px rgba(16,185,129,0.3)";
+                        }}
+                    >
+                        <Download size={18} /> Export CSV
+                    </button>
+                </div>
             </div>
 
             {/* Filters and Search */}
             <div style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "12px",
-                padding: "20px",
+                background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+                borderRadius: "20px",
+                padding: "24px",
                 marginBottom: "24px",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-                border: "1px solid #e5e7eb"
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
+                border: "1px solid #f3f4f6"
             }}>
                 <div style={{
                     display: "flex",
@@ -274,75 +420,88 @@ const Orders = ({ token }) => {
                     alignItems: "center"
                 }}>
                     {/* Search */}
-                    <div style={{ flex: 1, minWidth: "300px" }}>
-                        <div style={{
-                            position: "relative",
-                            display: "flex",
-                            alignItems: "center"
-                        }}>
-                            <Search size={20} style={{ 
-                                position: "absolute", 
-                                left: "12px", 
-                                color: "#9ca3af" 
-                            }} />
-                            <input
-                                type="text"
-                                placeholder="Search orders by ID or customer..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    width: "100%",
-                                    padding: "12px 12px 12px 44px",
-                                    borderRadius: "8px",
-                                    border: "1px solid #d1d5db",
-                                    fontSize: "0.875rem",
-                                    outline: "none",
-                                    transition: "all 0.2s ease"
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = "#3b82f6";
-                                    e.target.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = "#d1d5db";
-                                    e.target.style.boxShadow = "none";
-                                }}
-                            />
-                        </div>
+                    <div style={{ flex: 1, minWidth: "300px", position: "relative" }}>
+                        <Search size={20} style={{ 
+                            position: "absolute", 
+                            left: "16px", 
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#9ca3af" 
+                        }} />
+                        <input
+                            type="text"
+                            placeholder="Search orders by ID or customer..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "14px 16px 14px 48px",
+                                borderRadius: "12px",
+                                border: "2px solid #e5e7eb",
+                                fontSize: "15px",
+                                outline: "none",
+                                transition: "all 0.3s ease",
+                                backgroundColor: "#f9fafb"
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = "#8b5cf6";
+                                e.target.style.backgroundColor = "#ffffff";
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = "#e5e7eb";
+                                e.target.style.backgroundColor = "#f9fafb";
+                            }}
+                        />
                     </div>
 
                     {/* Status Filter */}
-                    <div style={{ minWidth: "200px" }}>
+                    <div style={{ position: "relative", minWidth: "200px" }}>
+                        <Filter size={18} style={{
+                            position: "absolute",
+                            left: "14px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#9ca3af"
+                        }} />
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                             style={{
                                 width: "100%",
-                                padding: "12px 16px",
-                                borderRadius: "8px",
-                                border: "1px solid #d1d5db",
-                                fontSize: "0.875rem",
-                                backgroundColor: "#ffffff",
+                                padding: "14px 16px 14px 42px",
+                                borderRadius: "12px",
+                                border: "2px solid #e5e7eb",
+                                fontSize: "15px",
+                                backgroundColor: "#f9fafb",
                                 cursor: "pointer",
                                 outline: "none",
-                                transition: "all 0.2s ease"
+                                transition: "all 0.3s ease",
+                                appearance: "none"
                             }}
                             onFocus={(e) => {
-                                e.target.style.borderColor = "#3b82f6";
-                                e.target.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                                e.target.style.borderColor = "#8b5cf6";
+                                e.target.style.backgroundColor = "#ffffff";
                             }}
                             onBlur={(e) => {
-                                e.target.style.borderColor = "#d1d5db";
-                                e.target.style.boxShadow = "none";
+                                e.target.style.borderColor = "#e5e7eb";
+                                e.target.style.backgroundColor = "#f9fafb";
                             }}
                         >
                             <option value="all">All Status</option>
-                            <option value="Order Placed">Order Placed</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="Order Placed">📦 Order Placed</option>
+                            <option value="Processing">⏳ Processing</option>
+                            <option value="Shipped">🚚 Shipped</option>
+                            <option value="Delivered">✅ Delivered</option>
+                            <option value="Cancelled">❌ Cancelled</option>
                         </select>
+                        <ChevronDown size={18} style={{
+                            position: "absolute",
+                            right: "14px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            color: "#9ca3af",
+                            pointerEvents: "none"
+                        }} />
                     </div>
                 </div>
             </div>
@@ -357,14 +516,14 @@ const Orders = ({ token }) => {
                     gap: "16px"
                 }}>
                     <div style={{
-                        width: "40px",
-                        height: "40px",
-                        border: "4px solid #e5e7eb",
-                        borderTop: "4px solid #3b82f6",
+                        width: "48px",
+                        height: "48px",
+                        border: "3px solid #f3f4f6",
+                        borderTop: "3px solid #8b5cf6",
                         borderRadius: "50%",
                         animation: "spin 1s linear infinite"
                     }}></div>
-                    <p style={{ color: "#6b7280", margin: 0 }}>Loading orders...</p>
+                    <p style={{ color: "#6b7280", fontWeight: 500 }}>Loading orders...</p>
                 </div>
             ) : (
                 <div>
@@ -391,14 +550,30 @@ const Orders = ({ token }) => {
                             {/* Orders Grid */}
                             <div style={{
                                 display: "grid",
-                                gap: "16px",
+                                gap: "20px",
                                 marginBottom: "24px"
                             }}>
                                 {currentOrders.map((order, index) => (
                                     <div 
                                         key={index} 
                                         className="order-card"
-                                        style={cardStyle}
+                                        style={{
+                                            background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+                                            borderRadius: "20px",
+                                            padding: "24px",
+                                            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.06)",
+                                            border: "1px solid #f3f4f6",
+                                            transition: "all 0.3s ease",
+                                            cursor: "pointer"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = "translateY(-4px)";
+                                            e.currentTarget.style.boxShadow = "0 12px 30px rgba(0,0,0,0.1)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = "translateY(0)";
+                                            e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
+                                        }}
                                         onClick={() => {
                                             setSelectedOrder(order);
                                             setShowOrderModal(true);
@@ -409,65 +584,142 @@ const Orders = ({ token }) => {
                                             justifyContent: 'space-between', 
                                             alignItems: 'flex-start',
                                             flexWrap: "wrap",
-                                            gap: "16px"
+                                            gap: "20px"
                                         }}>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{
                                                     display: "flex",
                                                     alignItems: "center",
                                                     gap: "12px",
-                                                    marginBottom: "12px",
+                                                    marginBottom: "16px",
                                                     flexWrap: "wrap"
                                                 }}>
-                                                    <h3 style={{ 
-                                                        margin: 0, 
-                                                        color: "#111827",
-                                                        fontSize: "1.125rem",
-                                                        fontWeight: "600"
+                                                    <div style={{
+                                                        width: "44px",
+                                                        height: "44px",
+                                                        borderRadius: "12px",
+                                                        background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        color: "white",
+                                                        fontSize: "18px",
+                                                        fontWeight: "700"
                                                     }}>
-                                                        #{order._id?.slice(-8) || 'N/A'}
-                                                    </h3>
-                                                    <span className="status-badge" style={statusBadgeStyle(order.status)}>
-                                                        {order.status}
-                                                    </span>
+                                                        {order._id?.slice(-2).toUpperCase() || '??'}
+                                                    </div>
+                                                    <div>
+                                                        <h3 style={{ 
+                                                            margin: "0 0 4px 0", 
+                                                            color: "#1f2937",
+                                                            fontSize: "1.125rem",
+                                                            fontWeight: "700"
+                                                        }}>
+                                                            Order #{order._id?.slice(-8) || 'N/A'}
+                                                        </h3>
+                                                        <span className="status-badge" style={statusBadgeStyle(order.status)}>
+                                                            {getStatusIcon(order.status)} {order.status}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 
                                                 <div style={{
                                                     display: "grid",
-                                                    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                                                    gap: "12px",
-                                                    marginBottom: "12px"
+                                                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                                                    gap: "16px"
                                                 }}>
-                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                        <User size={16} style={{ color: "#6b7280" }} />
-                                                        <span style={{ fontSize: "0.875rem", color: "#374151" }}>
-                                                            {order.userId || 'Unknown'}
-                                                        </span>
+                                                    <div style={{ 
+                                                        display: "flex", 
+                                                        alignItems: "center", 
+                                                        gap: "10px",
+                                                        padding: "12px",
+                                                        backgroundColor: "rgba(59,130,246,0.05)",
+                                                        borderRadius: "10px"
+                                                    }}>
+                                                        <div style={{
+                                                            width: "32px",
+                                                            height: "32px",
+                                                            borderRadius: "8px",
+                                                            backgroundColor: "rgba(59,130,246,0.1)",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center"
+                                                        }}>
+                                                            <User size={16} style={{ color: "#3b82f6" }} />
+                                                        </div>
+                                                        <div>
+                                                            <p style={{ margin: "0 0 2px 0", fontSize: "11px", color: "#6b7280", fontWeight: "600" }}>CUSTOMER</p>
+                                                            <p style={{ margin: 0, fontSize: "13px", color: "#1f2937", fontWeight: "600" }}>
+                                                                {order.userId?.slice(-8) || 'Unknown'}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                        <DollarSign size={16} style={{ color: "#6b7280" }} />
-                                                        <span style={{ fontSize: "0.875rem", color: "#374151", fontWeight: "500" }}>
-                                                            {currency}{order.amount}
-                                                        </span>
+                                                    <div style={{ 
+                                                        display: "flex", 
+                                                        alignItems: "center", 
+                                                        gap: "10px",
+                                                        padding: "12px",
+                                                        backgroundColor: "rgba(16,185,129,0.05)",
+                                                        borderRadius: "10px"
+                                                    }}>
+                                                        <div style={{
+                                                            width: "32px",
+                                                            height: "32px",
+                                                            borderRadius: "8px",
+                                                            backgroundColor: "rgba(16,185,129,0.1)",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center"
+                                                        }}>
+                                                            <DollarSign size={16} style={{ color: "#10b981" }} />
+                                                        </div>
+                                                        <div>
+                                                            <p style={{ margin: "0 0 2px 0", fontSize: "11px", color: "#6b7280", fontWeight: "600" }}>AMOUNT</p>
+                                                            <p style={{ margin: 0, fontSize: "13px", color: "#10b981", fontWeight: "700" }}>
+                                                                {currency}{order.amount}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                        <Calendar size={16} style={{ color: "#6b7280" }} />
-                                                        <span style={{ fontSize: "0.875rem", color: "#374151" }}>
-                                                            {new Date(order.date).toLocaleDateString()}
-                                                        </span>
+                                                    <div style={{ 
+                                                        display: "flex", 
+                                                        alignItems: "center", 
+                                                        gap: "10px",
+                                                        padding: "12px",
+                                                        backgroundColor: "rgba(245,158,11,0.05)",
+                                                        borderRadius: "10px"
+                                                    }}>
+                                                        <div style={{
+                                                            width: "32px",
+                                                            height: "32px",
+                                                            borderRadius: "8px",
+                                                            backgroundColor: "rgba(245,158,11,0.1)",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center"
+                                                        }}>
+                                                            <Calendar size={16} style={{ color: "#f59e0b" }} />
+                                                        </div>
+                                                        <div>
+                                                            <p style={{ margin: "0 0 2px 0", fontSize: "11px", color: "#6b7280", fontWeight: "600" }}>DATE</p>
+                                                            <p style={{ margin: 0, fontSize: "13px", color: "#1f2937", fontWeight: "600" }}>
+                                                                {new Date(order.date).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             
-                                            <div style={{ minWidth: "200px" }}>
+                                            <div style={{ minWidth: "220px" }}>
                                                 <label style={{ 
                                                     display: "block", 
-                                                    marginBottom: "8px",
-                                                    fontWeight: "500",
+                                                    marginBottom: "10px",
+                                                    fontWeight: "600",
                                                     color: "#374151",
-                                                    fontSize: "0.875rem"
+                                                    fontSize: "13px",
+                                                    textTransform: "uppercase",
+                                                    letterSpacing: "0.05em"
                                                 }}>
-                                                    Update Status:
+                                                    Update Status
                                                 </label>
                                                 <select 
                                                     value={order.status}
@@ -477,28 +729,29 @@ const Orders = ({ token }) => {
                                                     }}
                                                     style={{
                                                         width: "100%",
-                                                        padding: '8px 12px',
-                                                        borderRadius: '6px',
-                                                        border: '1px solid #d1d5db',
-                                                        fontSize: "0.875rem",
+                                                        padding: '12px 14px',
+                                                        borderRadius: '12px',
+                                                        border: '2px solid #e5e7eb',
+                                                        fontSize: "14px",
                                                         backgroundColor: "#ffffff",
                                                         cursor: "pointer",
-                                                        transition: "all 0.2s ease"
+                                                        transition: "all 0.3s ease",
+                                                        outline: "none"
                                                     }}
                                                     onFocus={(e) => {
-                                                        e.target.style.borderColor = "#3b82f6";
-                                                        e.target.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                                                        e.target.style.borderColor = "#8b5cf6";
+                                                        e.target.style.boxShadow = "0 0 0 4px rgba(139,92,246,0.1)";
                                                     }}
                                                     onBlur={(e) => {
-                                                        e.target.style.borderColor = "#d1d5db";
+                                                        e.target.style.borderColor = "#e5e7eb";
                                                         e.target.style.boxShadow = "none";
                                                     }}
                                                 >
-                                                    <option value="Order Placed">Order Placed</option>
-                                                    <option value="Processing">Processing</option>
-                                                    <option value="Shipped">Shipped</option>
-                                                    <option value="Delivered">Delivered</option>
-                                                    <option value="Cancelled">Cancelled</option>
+                                                    <option value="Order Placed">📦 Order Placed</option>
+                                                    <option value="Processing">⏳ Processing</option>
+                                                    <option value="Shipped">🚚 Shipped</option>
+                                                    <option value="Delivered">✅ Delivered</option>
+                                                    <option value="Cancelled">❌ Cancelled</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -506,10 +759,10 @@ const Orders = ({ token }) => {
                                         {/* Quick Actions */}
                                         <div style={{
                                             display: "flex",
-                                            gap: "8px",
-                                            marginTop: "16px",
-                                            paddingTop: "16px",
-                                            borderTop: "1px solid #e5e7eb"
+                                            gap: "12px",
+                                            marginTop: "20px",
+                                            paddingTop: "20px",
+                                            borderTop: "1px solid #f3f4f6"
                                         }}>
                                             <button
                                                 onClick={(e) => {
@@ -517,23 +770,44 @@ const Orders = ({ token }) => {
                                                     setSelectedOrder(order);
                                                     setShowOrderModal(true);
                                                 }}
-                                                className="button-hover"
                                                 style={{
                                                     display: "flex",
                                                     alignItems: "center",
-                                                    gap: "6px",
-                                                    padding: "6px 12px",
-                                                    borderRadius: "6px",
-                                                    border: "1px solid #d1d5db",
-                                                    backgroundColor: "#ffffff",
-                                                    color: "#374151",
-                                                    fontSize: "0.75rem",
-                                                    cursor: "pointer"
+                                                    gap: "8px",
+                                                    padding: "10px 16px",
+                                                    borderRadius: "10px",
+                                                    border: "none",
+                                                    background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                                                    color: "white",
+                                                    fontSize: "13px",
+                                                    fontWeight: "600",
+                                                    cursor: "pointer",
+                                                    boxShadow: "0 4px 15px rgba(139,92,246,0.3)",
+                                                    transition: "all 0.3s ease"
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.target.style.transform = "translateY(-2px)";
+                                                    e.target.style.boxShadow = "0 6px 20px rgba(139,92,246,0.4)";
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.target.style.transform = "translateY(0)";
+                                                    e.target.style.boxShadow = "0 4px 15px rgba(139,92,246,0.3)";
                                                 }}
                                             >
-                                                <Eye size={14} />
+                                                <Eye size={16} />
                                                 View Details
                                             </button>
+                                            <span style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                                padding: "10px 16px",
+                                                fontSize: "13px",
+                                                color: "#6b7280"
+                                            }}>
+                                                <Package size={16} />
+                                                {order.items?.length || 0} items
+                                            </span>
                                         </div>
                                     </div>
                                 ))}
@@ -613,139 +887,277 @@ const Orders = ({ token }) => {
             
             {/* Order Details Modal */}
             {showOrderModal && selectedOrder && (
-                <div style={modalStyle} onClick={() => setShowOrderModal(false)}>
-                    <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
+                <div style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(0,0,0,0.6)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 1000,
+                    padding: "20px"
+                }} onClick={() => setShowOrderModal(false)}>
+                    <div style={{
+                        background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+                        borderRadius: "24px",
+                        maxWidth: "800px",
+                        width: "100%",
+                        maxHeight: "90vh",
+                        overflow: "auto",
+                        boxShadow: "0 25px 50px rgba(0,0,0,0.25)"
+                    }} onClick={(e) => e.stopPropagation()}>
+                        {/* Header */}
                         <div style={{
+                            padding: "24px 24px 0 24px",
                             display: "flex",
                             justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: "24px"
+                            alignItems: "center"
                         }}>
-                            <h2 style={{ margin: 0, color: "#111827", fontSize: "1.5rem" }}>
-                                Order Details
-                            </h2>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{
+                                    width: "44px",
+                                    height: "44px",
+                                    borderRadius: "12px",
+                                    background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white"
+                                }}>
+                                    <ShoppingBag size={24} />
+                                </div>
+                                <div>
+                                    <h2 style={{ margin: "0 0 4px 0", fontSize: "1.5rem", fontWeight: "800", color: "#1f2937" }}>
+                                        Order Details
+                                    </h2>
+                                    <span className="status-badge" style={statusBadgeStyle(selectedOrder.status)}>
+                                        {getStatusIcon(selectedOrder.status)} {selectedOrder.status}
+                                    </span>
+                                </div>
+                            </div>
                             <button
                                 onClick={() => setShowOrderModal(false)}
                                 style={{
-                                    backgroundColor: "transparent",
+                                    width: "40px",
+                                    height: "40px",
+                                    borderRadius: "10px",
                                     border: "none",
-                                    fontSize: "1.5rem",
+                                    backgroundColor: "#f3f4f6",
                                     cursor: "pointer",
+                                    fontSize: "20px",
                                     color: "#6b7280",
-                                    padding: "4px",
-                                    borderRadius: "4px",
-                                    transition: "all 0.2s ease"
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "all 0.3s ease"
                                 }}
-                                onMouseOver={(e) => {
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = "#ef4444";
+                                    e.target.style.color = "white";
+                                }}
+                                onMouseLeave={(e) => {
                                     e.target.style.backgroundColor = "#f3f4f6";
-                                    e.target.style.color = "#374151";
-                                }}
-                                onMouseOut={(e) => {
-                                    e.target.style.backgroundColor = "transparent";
                                     e.target.style.color = "#6b7280";
                                 }}
                             >
-                                ×
+                                ✕
                             </button>
                         </div>
                         
-                        <div style={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                            gap: "20px",
-                            marginBottom: "24px"
-                        }}>
-                            <div>
-                                <h3 style={{ marginBottom: "12px", color: "#374151", fontSize: "1rem" }}>
-                                    Order Information
-                                </h3>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                    <div><strong>Order ID:</strong> {selectedOrder._id}</div>
-                                    <div><strong>Status:</strong> 
-                                        <span className="status-badge" style={{ ...statusBadgeStyle(selectedOrder.status), marginLeft: "8px" }}>
-                                            {selectedOrder.status}
-                                        </span>
-                                    </div>
-                                    <div><strong>Date:</strong> {new Date(selectedOrder.date).toLocaleString()}</div>
-                                    <div><strong>Payment Method:</strong> {selectedOrder.paymentMethod}</div>
+                        {/* Content */}
+                        <div style={{ padding: "24px" }}>
+                            {/* Info Cards Grid */}
+                            <div style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                                gap: "16px",
+                                marginBottom: "24px"
+                            }}>
+                                <div style={{
+                                    background: "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(167,139,250,0.1) 100%)",
+                                    padding: "16px",
+                                    borderRadius: "12px",
+                                    border: "2px solid rgba(139,92,246,0.1)"
+                                }}>
+                                    <p style={{ margin: "0 0 4px 0", fontSize: "11px", color: "#6b7280", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.05em" }}>Order ID</p>
+                                    <p style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#8b5cf6" }}>#{selectedOrder._id?.slice(-8)}</p>
+                                </div>
+                                <div style={{
+                                    background: "linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.1) 100%)",
+                                    padding: "16px",
+                                    borderRadius: "12px",
+                                    border: "2px solid rgba(16,185,129,0.1)"
+                                }}>
+                                    <p style={{ margin: "0 0 4px 0", fontSize: "11px", color: "#6b7280", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.05em" }}>Total Amount</p>
+                                    <p style={{ margin: 0, fontSize: "18px", fontWeight: "800", color: "#10b981" }}>{currency}{selectedOrder.amount}</p>
+                                </div>
+                                <div style={{
+                                    background: "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(96,165,250,0.1) 100%)",
+                                    padding: "16px",
+                                    borderRadius: "12px",
+                                    border: "2px solid rgba(59,130,246,0.1)"
+                                }}>
+                                    <p style={{ margin: "0 0 4px 0", fontSize: "11px", color: "#6b7280", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.05em" }}>Customer</p>
+                                    <p style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#3b82f6" }}>{selectedOrder.userId?.slice(-8) || 'Unknown'}</p>
+                                </div>
+                                <div style={{
+                                    background: "linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(251,191,36,0.1) 100%)",
+                                    padding: "16px",
+                                    borderRadius: "12px",
+                                    border: "2px solid rgba(245,158,11,0.1)"
+                                }}>
+                                    <p style={{ margin: "0 0 4px 0", fontSize: "11px", color: "#6b7280", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.05em" }}>Date</p>
+                                    <p style={{ margin: 0, fontSize: "13px", fontWeight: "600", color: "#f59e0b" }}>{new Date(selectedOrder.date).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+
+                            {/* Payment Method */}
+                            <div style={{
+                                backgroundColor: "#f9fafb",
+                                padding: "16px",
+                                borderRadius: "12px",
+                                marginBottom: "24px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px"
+                            }}>
+                                <div style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderRadius: "10px",
+                                    backgroundColor: "#e5e7eb",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}>
+                                    <DollarSign size={20} style={{ color: "#6b7280" }} />
+                                </div>
+                                <div>
+                                    <p style={{ margin: "0 0 2px 0", fontSize: "12px", color: "#6b7280", fontWeight: "600" }}>Payment Method</p>
+                                    <p style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#1f2937" }}>{selectedOrder.paymentMethod || 'Cash on Delivery'}</p>
                                 </div>
                             </div>
                             
-                            <div>
-                                <h3 style={{ marginBottom: "12px", color: "#374151", fontSize: "1rem" }}>
-                                    Customer Information
-                                </h3>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                    <div><strong>Customer ID:</strong> {selectedOrder.userId}</div>
-                                    <div><strong>Total Amount:</strong> {currency}{selectedOrder.amount}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {selectedOrder.items && selectedOrder.items.length > 0 && (
-                            <div>
-                                <h3 style={{ marginBottom: "16px", color: "#374151", fontSize: "1rem" }}>
-                                    Order Items ({selectedOrder.items.length})
-                                </h3>
-                                <div style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                                    gap: "12px"
-                                }}>
-                                    {selectedOrder.items.map((item, itemIndex) => (
-                                        <div key={itemIndex} style={{
-                                            padding: '16px',
-                                            backgroundColor: '#f9fafb',
-                                            borderRadius: '8px',
-                                            border: '1px solid #e5e7eb',
-                                            transition: "all 0.2s ease"
-                                        }}
-                                        onMouseOver={(e) => {
-                                            e.target.style.backgroundColor = '#f3f4f6';
-                                            e.target.style.transform = 'translateY(-2px)';
-                                        }}
-                                        onMouseOut={(e) => {
-                                            e.target.style.backgroundColor = '#f9fafb';
-                                            e.target.style.transform = 'translateY(0)';
-                                        }}
-                                        >
-                                            <div style={{ fontWeight: "600", marginBottom: "8px", color: "#111827" }}>
-                                                {item.name}
+                            {/* Order Items */}
+                            {selectedOrder.items && selectedOrder.items.length > 0 && (
+                                <div>
+                                    <h3 style={{ 
+                                        marginBottom: "16px", 
+                                        color: "#1f2937", 
+                                        fontSize: "1.1rem",
+                                        fontWeight: "700",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px"
+                                    }}>
+                                        <Package size={20} style={{ color: "#8b5cf6" }} />
+                                        Order Items ({selectedOrder.items.length})
+                                    </h3>
+                                    <div style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                                        gap: "12px"
+                                    }}>
+                                        {selectedOrder.items.map((item, itemIndex) => (
+                                            <div key={itemIndex} style={{
+                                                padding: '16px',
+                                                background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+                                                borderRadius: '16px',
+                                                border: '1px solid #f3f4f6',
+                                                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                                                transition: "all 0.3s ease"
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = "translateY(-2px)";
+                                                e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = "translateY(0)";
+                                                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                                            }}
+                                            >
+                                                <div style={{ fontWeight: "700", marginBottom: "12px", color: "#1f2937", fontSize: "15px" }}>
+                                                    {item.name}
+                                                </div>
+                                                <div style={{ 
+                                                    fontSize: "13px", 
+                                                    color: "#6b7280",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    gap: "6px"
+                                                }}>
+                                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                        <span>Size:</span>
+                                                        <span style={{ fontWeight: "600", color: "#374151" }}>{item.size}</span>
+                                                    </div>
+                                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                        <span>Quantity:</span>
+                                                        <span style={{ fontWeight: "600", color: "#374151" }}>{item.quantity}</span>
+                                                    </div>
+                                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                        <span>Price:</span>
+                                                        <span style={{ fontWeight: "700", color: "#10b981" }}>{currency}{item.price}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div style={{ 
-                                                fontSize: "0.875rem", 
-                                                color: "#6b7280",
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: "4px"
-                                            }}>
-                                                <div>Size: {item.size}</div>
-                                                <div>Quantity: {item.quantity}</div>
-                                                <div>Price: {currency}{item.price}</div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
+                            
+                            {/* Actions */}
+                            <div style={{ marginTop: "24px", display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+                                <button
+                                    onClick={() => setShowOrderModal(false)}
+                                    style={{
+                                        backgroundColor: "#f3f4f6",
+                                        color: "#6b7280",
+                                        border: "none",
+                                        padding: "12px 24px",
+                                        borderRadius: "12px",
+                                        cursor: "pointer",
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                        transition: "all 0.3s ease"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = "#e5e7eb";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = "#f3f4f6";
+                                    }}
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    onClick={() => setShowOrderModal(false)}
+                                    style={{
+                                        background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                                        color: "white",
+                                        border: "none",
+                                        padding: "12px 24px",
+                                        borderRadius: "12px",
+                                        cursor: "pointer",
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                        boxShadow: "0 4px 15px rgba(139,92,246,0.3)",
+                                        transition: "all 0.3s ease"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = "translateY(-2px)";
+                                        e.target.style.boxShadow = "0 6px 20px rgba(139,92,246,0.4)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = "translateY(0)";
+                                        e.target.style.boxShadow = "0 4px 15px rgba(139,92,246,0.3)";
+                                    }}
+                                >
+                                    Print Invoice
+                                </button>
                             </div>
-                        )}
-                        
-                        <div style={{ marginTop: "24px", textAlign: "right" }}>
-                            <button
-                                onClick={() => setShowOrderModal(false)}
-                                className="button-hover"
-                                style={{
-                                    backgroundColor: "#3b82f6",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "10px 20px",
-                                    borderRadius: "6px",
-                                    cursor: "pointer",
-                                    fontSize: "0.875rem",
-                                    fontWeight: "500"
-                                }}
-                            >
-                                Close
-                            </button>
                         </div>
                     </div>
                 </div>

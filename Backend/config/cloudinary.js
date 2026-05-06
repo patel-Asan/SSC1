@@ -2,20 +2,22 @@ import { v2 as cloudinary } from "cloudinary";
 
 const connectCloudinary = async () => {
   try {
-    const cloudName = process.env.CLOUDINARY_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_SECRET_KEY;
-
-    if (!cloudName || !apiKey || !apiSecret) {
-      throw new Error("Cloudinary credentials are not properly configured");
+    const cloudinaryUrl = process.env.CLOUDINARY_URL;
+    
+    if (!cloudinaryUrl) {
+      throw new Error("CLOUDINARY_URL is not configured");
     }
 
-    cloudinary.config({
-      cloud_name: cloudName,
-      api_key: apiKey,
-      api_secret: apiSecret
-    });
-
+    const urlMatch = cloudinaryUrl.match(/cloudinary:\/\/([^:]+):([^@]+)@(.+)/);
+    if (urlMatch) {
+      cloudinary.config({
+        cloud_name: urlMatch[3],
+        api_key: urlMatch[1],
+        api_secret: urlMatch[2],
+        secure: true
+      });
+    }
+    
     console.log("✅ Cloudinary configured successfully");
   } catch (error) {
     console.error('❌ Failed to configure Cloudinary:', error.message);

@@ -1,315 +1,246 @@
 
-
 import React, { useContext, useState, useEffect } from "react";
 import { Shopcontext } from "../context/shopcontext";
 import Title from "../componet/title";
 import axios from "axios";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 const Order = () => {
-  const { backendUrl, token, currency } = useContext(Shopcontext);
+  const { backendUrl, token, currency, navigate } = useContext(Shopcontext);
+  const [orderData, setOrderData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [orderData,setordedata] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-
-  const loadOrderData = async () =>{
-    try{
-      setLoading(true)
-      setError(null)
+  const loadOrderData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
       
-      if(!token){
-        setError("No authentication token found")
-        return
+      if (!token) {
+        navigate("/login");
+        return;
       }
       
-      const response = await axios.post(backendUrl + '/api/order/userorders ',{},{headers:{token}})
+      const response = await axios.post(backendUrl + '/api/order/userorders', {}, { headers: { token } });
       
-      if(response.data.success){
-        let allOrdersItem = []
+      if (response.data.success) {
+        let allOrdersItem = [];
         
-        if(response.data.orders && Array.isArray(response.data.orders)){
-          response.data.orders.forEach((order)=>{
-            if(order.items && Array.isArray(order.items)){
-              order.items.forEach((item)=>{
-                item['status']=order.status
-                item['payment']= order.payment
-                item['paymentMethod']=order.paymentMethod
-                item['data']=order.data
-                allOrdersItem.push(item)
-              })
+        if (response.data.orders && Array.isArray(response.data.orders)) {
+          response.data.orders.forEach((order) => {
+            if (order.items && Array.isArray(order.items)) {
+              order.items.forEach((item) => {
+                item['status'] = order.status;
+                item['payment'] = order.payment;
+                item['paymentMethod'] = order.paymentMethod;
+                item['date'] = order.date;
+                allOrdersItem.push(item);
+              });
             }
-          })
+          });
         }
         
-        setordedata(allOrdersItem.reverse());
+        setOrderData(allOrdersItem.reverse());
       } else {
-        setError("Failed to load orders")
+        setError("Failed to load orders");
       }
-    }catch (error) {
-      console.error("Error loading orders:", error)
-      setError("Failed to load orders. Please try again.")
+    } catch (error) {
+      setError("Failed to load orders. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-   useEffect(()=>{
-  loadOrderData()
-   },[token])
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    } else {
+      loadOrderData();
+    }
+  }, [token]);
+
+  const statusColors = {
+    "pending": { bg: "#fef3c7", text: "#92400e" },
+    "processing": { bg: "#dbeafe", text: "#1e40af" },
+    "shipped": { bg: "#e0e7ff", text: "#3730a3" },
+    "delivered": { bg: "#d1fae5", text: "#065f46" },
+    "cancelled": { bg: "#fee2e2", text: "#991b1b" },
+  };
 
   return (
-    <div style={wrapperStyle}>
-      <div style={titleStyle}>
-        <Title text1="MY_" text2="ORDER" />
-      </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{
+        padding: "80px 40px",
+        fontFamily: "'Inter', sans-serif",
+        backgroundColor: "#fff",
+        minHeight: "100vh",
+      }}
+    >
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        style={{ marginBottom: "40px" }}
+      >
+        <Title text1="MY_" text2="ORDERS" />
+      </motion.div>
 
-      <div style={{ marginTop: "30px", width: "100%" }}>
+      <motion.div
+        style={{ maxWidth: "1000px", margin: "0 auto" }}
+      >
         {loading && (
-          <div style={loadingStyle}>
-            <p>Loading orders...</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{ textAlign: "center", padding: "60px" }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              style={{
+                width: 40,
+                height: 40,
+                border: "3px solid #e5e7eb",
+                borderTop: "3px solid #ff6f61",
+                borderRadius: "50%",
+                margin: "0 auto",
+              }}
+            />
+          </motion.div>
         )}
         
         {error && (
-          <div style={errorStyle}>
-            <p>{error}</p>
-            <button onClick={loadOrderData} style={retryBtnStyle}>Retry</button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#991b1b",
+              backgroundColor: "#fef2f2",
+              borderRadius: "20px",
+              maxWidth: "500px",
+              margin: "0 auto",
+            }}
+          >
+            <p style={{ marginBottom: "16px", fontWeight: "600" }}>{error}</p>
+            <motion.button
+              onClick={loadOrderData}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                padding: "12px 24px",
+                backgroundColor: "#ff6f61",
+                color: "#fff",
+                border: "none",
+                borderRadius: "12px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Try Again
+            </motion.button>
+          </motion.div>
         )}
         
         {!loading && !error && orderData.length === 0 && (
-          <div style={emptyStyle}>
-            <p>No orders found</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ textAlign: "center", padding: "80px 20px" }}
+          >
+            <p style={{ fontSize: "64px", marginBottom: "16px" }}>📦</p>
+            <p style={{ color: "#374151", fontSize: "20px", fontWeight: "600", marginBottom: "8px" }}>No orders yet</p>
+            <p style={{ color: "#9ca3af", marginBottom: "32px" }}>Start shopping to see your orders here</p>
+            <motion.button
+              onClick={() => navigate("/collection")}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                padding: "16px 32px",
+                backgroundColor: "#ff6f61",
+                color: "#fff",
+                border: "none",
+                borderRadius: "14px",
+                fontWeight: "700",
+                fontSize: "15px",
+                cursor: "pointer",
+                boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
+              }}
+            >
+              Browse Collection →
+            </motion.button>
+          </motion.div>
         )}
         
-        {!loading && !error && orderData.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              ...cardStyle,
-              animation: "fadeInUp 0.6s ease-out",
-            }}
-          >
-            {/* Product + Info */}
-            <div style={orderRowStyle}>
-              <div style={leftSectionStyle}>
-                <img
+        <AnimatePresence>
+          {!loading && !error && orderData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: index * 0.05 }}
+              style={{
+                backgroundColor: "#fff",
+                marginBottom: "20px",
+                padding: "24px",
+                borderRadius: "20px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+                border: "1px solid #f3f4f6",
+              }}
+              whileHover={{ boxShadow: "0 8px 30px rgba(0,0,0,0.1)", y: -2 }}
+            >
+              <div style={{ display: "flex", gap: "20px", alignItems: "center", flexWrap: "wrap" }}>
+                <motion.img
                   src={item.image && item.image[0] ? item.image[0] : '/placeholder-image.jpg'}
                   alt="product"
-                  style={imageStyle}
-                  onError={(e) => {
-                    e.target.src = '/placeholder-image.jpg'
+                  whileHover={{ scale: 1.05 }}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                    flexShrink: 0,
                   }}
                 />
-                <div>
-                  <p style={productNameStyle}>{item.name || 'Product Name'}</p>
-                  <div style={metaDataStyle}>
-                    <p style={priceStyle}>{currency}{item.price || 0}</p>
-                    <p style={labelStyle}>Quantity: {item.quantity || 0}</p>
-                    <p style={labelStyle}>Size: {item.size || 'N/A'}</p>
+                
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <p style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", marginBottom: "8px" }}>
+                    {item.name || 'Product Name'}
+                  </p>
+                  <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "14px", color: "#6b7280" }}>
+                    <span style={{ fontWeight: "700", color: "#ff6f61" }}>{currency}{item.price || 0}</span>
+                    <span>Qty: {item.quantity || 0}</span>
+                    <span>Size: {item.size || 'N/A'}</span>
                   </div>
-                  <p style={dateStyle}>
-                    DATE: <span style={{ color: "#9ca3af" }}>{item.data ? new Date(item.data).toDateString() : 'N/A'}</span>
-                  </p>
-                  <p style={dateStyle}>
-                    Payment: <span style={{ color: "#9ca3af" }}>{item.paymentMethod || 'N/A'}</span>
-                  </p>
+                  <div style={{ display: "flex", gap: "16px", fontSize: "12px", color: "#9ca3af", marginTop: "8px" }}>
+                    <span>{item.date ? new Date(item.date).toDateString() : 'N/A'}</span>
+                    <span>{item.paymentMethod || 'N/A'}</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Status + Button */}
-              <div style={rightSectionStyle}>
-                <div style={statusBoxStyle}>
-                  <span style={statusDot}></span>
-                  <p style={statusText}>{item.status || 'Pending'}</p>
-                </div>
-                <button onClick={loadOrderData} style={trackBtnStyle}>Track Order</button>
+                <motion.div
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: statusColors[item.status?.toLowerCase()]?.bg || "#f3f4f6",
+                    color: statusColors[item.status?.toLowerCase()]?.text || "#374151",
+                    borderRadius: "20px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  {item.status || 'Pending'}
+                </motion.div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
   );
 };
-
-// 🔵 Inline CSS
-
-const wrapperStyle = {
-  padding: "40px 16px",
-  fontFamily: "'Segoe UI', sans-serif",
-  backgroundColor: "#f1f5f9",
-};
-
-const titleStyle = {
-  fontSize: "28px",
-  fontWeight: "700",
-  textAlign: "center",
-};
-
-const cardStyle = {
-  backgroundColor: "#fff",
-  marginBottom: "20px",
-  padding: "20px",
-  borderRadius: "16px",
-  boxShadow: "0 6px 18px rgba(0, 0, 0, 0.07)",
-  transition: "all 0.3s ease",
-  maxWidth: "100%",
-};
-
-const orderRowStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "16px",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-
-  // Responsive styles
-  '@media (min-width: 768px)': {
-    flexDirection: "row",
-    alignItems: "center",
-  }
-};
-
-const leftSectionStyle = {
-  display: "flex",
-  gap: "16px",
-  flex: "1",
-  alignItems: "flex-start",
-};
-
-const imageStyle = {
-  width: "80px",
-  height: "80px",
-  objectFit: "cover",
-  borderRadius: "8px",
-  flexShrink: 0,
-};
-
-const productNameStyle = {
-  fontSize: "16px",
-  fontWeight: "600",
-  marginBottom: "6px",
-  color: "#1e293b",
-};
-
-const metaDataStyle = {
-  display: "flex",
-  gap: "12px",
-  flexWrap: "wrap",
-  fontSize: "14px",
-  color: "#475569",
-};
-
-const labelStyle = {
-  fontWeight: "500",
-};
-
-const priceStyle = {
-  color: "#1e3a8a",
-  fontWeight: "700",
-};
-
-const dateStyle = {
-  fontSize: "14px",
-  marginTop: "8px",
-  color: "#334155",
-};
-
-const rightSectionStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "10px",
-  alignItems: "flex-end",
-  justifyContent: "center",
-
-  // Responsive
-  '@media (min-width: 768px)': {
-    alignItems: "flex-end",
-  }
-};
-
-const statusBoxStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-};
-
-const statusDot = {
-  width: "10px",
-  height: "10px",
-  borderRadius: "50%",
-  backgroundColor: "#16a34a",
-};
-
-const statusText = {
-  fontSize: "14px",
-  fontWeight: "500",
-  color: "#065f46",
-};
-
-const trackBtnStyle = {
-  padding: "10px 16px",
-  backgroundColor: "#2563eb",
-  color: "#fff",
-  border: "none",
-  borderRadius: "6px",
-  fontWeight: "600",
-  fontSize: "14px",
-  cursor: "pointer",
-  transition: "transform 0.3s ease, background-color 0.3s ease",
-  boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
-};
-
-const loadingStyle = {
-  textAlign: "center",
-  padding: "20px",
-  color: "#6b7280",
-};
-
-const errorStyle = {
-  textAlign: "center",
-  padding: "20px",
-  color: "#991b1b",
-  backgroundColor: "#fef3f2",
-  border: "1px solid #fca5a5",
-  borderRadius: "8px",
-  marginBottom: "20px",
-};
-
-const retryBtnStyle = {
-  padding: "10px 20px",
-  backgroundColor: "#2563eb",
-  color: "#fff",
-  border: "none",
-  borderRadius: "6px",
-  fontWeight: "600",
-  fontSize: "14px",
-  cursor: "pointer",
-  transition: "transform 0.3s ease, background-color 0.3s ease",
-  boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
-};
-
-const emptyStyle = {
-  textAlign: "center",
-  padding: "20px",
-  color: "#6b7280",
-};
-
-// 🔄 Optional keyframe effect (CSS only if allowed in global style)
-/*
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-*/
 
 export default Order;

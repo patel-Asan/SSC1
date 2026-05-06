@@ -16,9 +16,12 @@ export const getDashboardStats = async (req, res) => {
             .limit(5)
             .populate('userId', 'name email');
         
-        // Get total revenue
-        const orders = await orderModel.find({ status: 'completed' });
-        const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+        // Get total revenue (from delivered orders)
+        const orders = await orderModel.find({ status: 'delivered' });
+        console.log('📦 Delivered orders found:', orders.length);
+        console.log('📦 Orders:', orders.map(o => ({ id: o._id, status: o.status, amount: o.amount, totalAmount: o.totalAmount })));
+        const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || order.amount || 0), 0);
+        console.log('💰 Total Revenue calculated:', totalRevenue);
         
         // Get monthly stats
         const currentMonth = new Date();
@@ -32,19 +35,21 @@ export const getDashboardStats = async (req, res) => {
         const monthlyRevenue = await orderModel.aggregate([
             {
                 $match: {
-                    status: 'completed',
+                    status: 'delivered',
                     createdAt: { $gte: currentMonth }
                 }
             },
             {
                 $group: {
                     _id: null,
-                    total: { $sum: '$totalAmount' }
+                    total: { $sum: { $ifNull: ['$totalAmount', '$amount', 0] } }
                 }
             }
         ]);
         
         const monthlyRevenueAmount = monthlyRevenue.length > 0 ? monthlyRevenue[0].total : 0;
+        console.log('📊 Monthly Revenue:', monthlyRevenueAmount);
+        console.log('📊 Sending data:', { totalUsers, totalProducts, totalOrders, totalRevenue, monthlyOrders, monthlyRevenue: monthlyRevenueAmount });
         
         res.status(200).json({
             success: true,
@@ -314,7 +319,7 @@ export const getSalesReport = async (req, res) => {
             {
                 $match: {
                     ...matchQuery,
-                    status: 'completed'
+                    status: 'delivered'
                 }
             },
             {

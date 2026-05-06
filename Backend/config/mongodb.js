@@ -10,19 +10,17 @@ const connectDB = async () => {
 
     console.log("Connecting to MongoDB...");
     
-    await mongoose.connect(`${mongoURI}/Surat_sari_center`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // ✅ Remove deprecated flags
+    await mongoose.connect(`${mongoURI}/Surat_sari_center`);
 
     console.log("✅ MongoDB connected successfully");
     
     mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB connection error:', err);
+      console.error('MongoDB runtime error:', err);
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ MongoDB disconnected');
+      console.log('MongoDB disconnected');
     });
 
   } catch (error) {

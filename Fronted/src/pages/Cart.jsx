@@ -1,23 +1,14 @@
-
 import React, { useContext, useEffect, useState } from "react";
 import { Shopcontext } from "../context/shopcontext";
 import Title from "../componet/title";
 import { assets } from "../assets/assets";
 import CartTotal from "../componet/carttotal";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const { products, currency, cartItems, updateQuantity, token, navigate } = useContext(Shopcontext);
   const [cartData, setCartData] = useState([]);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [hoveredTrash, setHoveredTrash] = useState(null);
-  const [animateIndex, setAnimateIndex] = useState(null);
-
-  const sizeColor = {
-    S: "#fde68a",
-    M: "#a7f3d0",
-    L: "#bfdbfe",
-    XL: "#fca5a5",
-  };
 
   useEffect(() => {
     if (!token) {
@@ -26,226 +17,275 @@ const Cart = () => {
     }
 
     if(products.length > 0){
-        const tempData = [];
-    for (const productId in cartItems) {
-      for (const size in cartItems[productId]) {
-        const quantity = cartItems[productId][size];
-        if (quantity > 0) {
-          tempData.push({
-            _id: productId,
-            size,
-            quantity,
-          });
+      const tempData = [];
+      for (const productId in cartItems) {
+        for (const size in cartItems[productId]) {
+          const quantity = cartItems[productId][size];
+          if (quantity > 0) {
+            tempData.push({
+              _id: productId,
+              size,
+              quantity,
+            });
+          }
         }
       }
+      setCartData(tempData);
     }
-    setCartData(tempData);
-    }
-    
   }, [cartItems, token]);
 
-  // Show login prompt if not authenticated
+  const handleRemoveItem = (item) => {
+    toast.info("Item removed from cart", { autoClose: 1500 });
+    updateQuantity(item._id, item.size, 0);
+  };
+
   if (!token) {
     return (
-      <div style={{ 
-        paddingTop: "3.5rem", 
-        paddingLeft: "1rem", 
-        paddingRight: "1rem",
-        textAlign: "center",
-        minHeight: "60vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center"
-      }}>
-        <div style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
-          <Title text1="YOUR_" text2="CART" />
-        </div>
-        <div style={{
-          backgroundColor: "#fff",
-          padding: "2rem",
-          borderRadius: "12px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          maxWidth: "400px"
-        }}>
-          <p style={{ color: "#6b7280", marginBottom: "1rem" }}>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{ 
+          paddingTop: "6rem", 
+          textAlign: "center",
+          minHeight: "60vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Title text1="YOUR_" text2="CART" />
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200 }}
+          style={{
+            backgroundColor: "#fff",
+            padding: "3rem",
+            borderRadius: "24px",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+            maxWidth: "450px",
+            marginTop: "2rem",
+          }}
+        >
+          <p style={{ color: "#6b7280", marginBottom: "1.5rem", fontSize: "16px" }}>
             Please login to view your cart
           </p>
-          <button
+          <motion.button
             onClick={() => navigate("/login")}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             style={{
-              backgroundColor: "#3b82f6",
+              backgroundColor: "#ff6f61",
               color: "#fff",
               border: "none",
-              padding: "12px 24px",
-              borderRadius: "6px",
-              fontSize: "14px",
-              fontWeight: "500",
+              padding: "16px 32px",
+              borderRadius: "12px",
+              fontSize: "15px",
+              fontWeight: "700",
               cursor: "pointer",
-              transition: "background-color 0.2s"
+              boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = "#2563eb"}
-            onMouseLeave={(e) => e.target.style.backgroundColor = "#3b82f6"}
           >
-            Login
-          </button>
-        </div>
-      </div>
+            Login →
+          </motion.button>
+        </motion.div>
+      </motion.div>
     );
   }
 
   return (
-    <div style={{ paddingTop: "3.5rem", paddingLeft: "1rem", paddingRight: "1rem" }}>
-      {/* Title */}
-      <div style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      style={{ 
+        paddingTop: "6rem", 
+        paddingLeft: "40px", 
+        paddingRight: "40px",
+        maxWidth: "1400px",
+        margin: "0 auto",
+      }}
+    >
+      <motion.div 
+        style={{ marginBottom: "2rem" }}
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+      >
         <Title text1="YOUR_" text2="CART" />
-      </div>
+      </motion.div>
 
-      {/* Cart Items */}
-      <div>
+      <AnimatePresence mode="popLayout">
         {cartData.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>Your cart is empty.</p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ 
+              textAlign: "center", 
+              padding: "100px 20px",
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                backgroundColor: "#f3f4f6",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 24px",
+                fontSize: "48px"
+              }}
+            >
+              🛒
+            </motion.div>
+            <h3 style={{ fontSize: "24px", fontWeight: "600", color: "#374151", marginBottom: "12px" }}>Your cart is empty</h3>
+            <p style={{ fontSize: "16px", color: "#9ca3af", marginBottom: "32px" }}>Looks like you haven't added anything yet</p>
+            <motion.button
+              onClick={() => navigate("/collection")}
+              whileHover={{ scale: 1.05, boxShadow: "0 8px 25px rgba(255,111,97,0.4)" }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                backgroundColor: "#ff6f61",
+                color: "#fff",
+                border: "none",
+                padding: "16px 40px",
+                borderRadius: "14px",
+                fontSize: "15px",
+                fontWeight: "700",
+                cursor: "pointer",
+                boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
+              }}
+            >
+              Start Shopping →
+            </motion.button>
+          </motion.div>
         ) : (
-          cartData.map((item, index) => {
-            const productData = products.find((p) => p._id === item._id);
-            if (!productData) return null;
+          <div>
+            {cartData.map((item, index) => {
+              const productData = products.find((p) => p._id === item._id);
+              if (!productData) return null;
 
-            return (
-              <div
-                key={index}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                style={{
-                  padding: "1rem 0",
-                  borderBottom: "1px solid #e5e7eb",
-                  display: "grid",
-                  gridTemplateColumns: "4fr 2fr 1fr",
-                  alignItems: "center",
-                  gap: "1rem",
-                  boxShadow:
-                    hoveredIndex === index
-                      ? "0 8px 16px rgba(0,0,0,0.05)"
-                      : "none",
-                  transform:
-                    hoveredIndex === index ? "translateY(-2px)" : "translateY(0)",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                {/* Product Details */}
-                <div style={{ display: "flex", alignItems: "start", gap: "1rem" }}>
-                  <img
+              return (
+                <motion.div
+                  key={`${item._id}-${item.size}`}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  style={{
+                    padding: "24px",
+                    borderBottom: "1px solid #f3f4f6",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "24px",
+                    backgroundColor: "#fff",
+                    borderRadius: "16px",
+                    marginBottom: "16px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
+                  }}
+                  whileHover={{ 
+                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                    y: -2,
+                  }}
+                >
+                  <motion.img
                     src={productData.image[0]}
                     alt={productData.name}
-                    style={{ width: "4rem", height: "auto" }}
+                    style={{ 
+                      width: "100px", 
+                      height: "100px", 
+                      objectFit: "cover",
+                      borderRadius: "12px",
+                      flexShrink: 0,
+                    }}
+                    whileHover={{ scale: 1.05 }}
                   />
-                  <div>
-                    <p style={{ fontSize: "1rem", fontWeight: "600" }}>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", marginBottom: "8px" }}>
                       {productData.name}
-                    </p>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        marginTop: "0.5rem",
-                      }}
-                    >
-                      <p>
-                        {currency}
-                        {productData.price}
-                      </p>
-                      <p
-                        style={{
-                          padding: "0.3rem 0.8rem",
-                          backgroundColor:
-                            sizeColor[item.size] || "#f3f4f6",
-                          borderRadius: "0.5rem",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        {item.size}
-                      </p>
+                    </h3>
+                    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                      <span style={{ fontSize: "18px", fontWeight: "700", color: "#ff6f61" }}>
+                        {currency}{productData.price}
+                      </span>
+                      <span style={{
+                        padding: "6px 12px",
+                        backgroundColor: "#f3f4f6",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        color: "#374151",
+                      }}>
+                        Size: {item.size}
+                      </span>
                     </div>
                   </div>
-                </div>
 
-                {/* Quantity Input */}
-                <input
-                  type="number"
-                  min={1}
-                  defaultValue={item.quantity}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (val > 0) {
-                      updateQuantity(item._id, item.size, val);
-                      setAnimateIndex(index);
-                      setTimeout(() => setAnimateIndex(null), 200);
-                    }
-                  }}
-                  style={{
-                    border: "1px solid #d1d5db",
-                    maxWidth: "4rem",
-                    padding: "0.3rem 0.6rem",
-                    transform:
-                      animateIndex === index ? "scale(1.1)" : "scale(1)",
-                    transition: "transform 0.2s ease",
-                  }}
-                />
+                  <motion.input
+                    type="number"
+                    min={1}
+                    defaultValue={item.quantity}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (val > 0) {
+                        updateQuantity(item._id, item.size, val);
+                      }
+                    }}
+                    style={{
+                      border: "2px solid #e5e7eb",
+                      width: "70px",
+                      padding: "8px",
+                      borderRadius: "10px",
+                      textAlign: "center",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      outline: "none",
+                    }}
+                    whileFocus={{ 
+                      borderColor: "#ff6f61",
+                      boxShadow: "0 0 0 3px rgba(255,111,97,0.2)"
+                    }}
+                  />
 
-                {/* Delete Icon */}
-                <img
-                  onClick={() => updateQuantity(item._id, item.size, 0)}
-                  onMouseEnter={() => setHoveredTrash(index)}
-                  onMouseLeave={() => setHoveredTrash(null)}
-                  src={assets.bin_icon}
-                  alt="Delete"
-                  style={{
-                    width: "1.25rem",
-                    cursor: "pointer",
-                    filter:
-                      hoveredTrash === index
-                        ? "grayscale(0)"
-                        : "grayscale(1)",
-                    transition: "filter 0.2s ease",
-                    marginRight: "1rem",
-                  }}
-                />
-              </div>
-            );
-          })
+                  <motion.img
+                    onClick={() => handleRemoveItem(item)}
+                    src={assets.bin_icon}
+                    alt="Delete"
+                    style={{
+                      width: "20px",
+                      cursor: "pointer",
+                      opacity: 0.5,
+                    }}
+                    whileHover={{ 
+                      opacity: 1,
+                      scale: 1.2,
+                    }}
+                    whileTap={{ scale: 0.9 }}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
         )}
-      </div>
+      </AnimatePresence>
 
-      {/* Floating Checkout Button */}
-    {cartData.length > 0 && (
-  <div
-    style={{
-      position: "fixed",
-      bottom: "1rem",
-      right: "1rem",
-      zIndex: 50,
-      width: "100%",
-      maxWidth: "500px",
-      transition: "all 0.3s ease-in-out",
-    }}
-    className="sm:right-8"
-  >
-    <div className="flex justify-end">
-      <div
-        className="w-full sm:w-[450px] bg-white border border-gray-200 rounded-xl shadow-xl px-5 py-4"
-        style={{
-          backdropFilter: "blur(6px)",
-        }}
-      >
-        <CartTotal />
-      </div>
-    </div>
-  </div>
-)}
-
-
-
-    </div>
+      {/* Cart Total */}
+      {cartData.length > 0 && (
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          style={{ marginTop: "40px", maxWidth: "500px" }}
+        >
+          <CartTotal />
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 

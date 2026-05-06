@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'}/api`;
 
 class ApiService {
   constructor() {
@@ -124,6 +124,20 @@ class ApiService {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(cartData),
+    });
+  }
+
+  // Stats API
+  async getStats() {
+    return this.request('/stats');
+  }
+
+  // Get total users count (for admin/stats)
+  async getUserCount(token) {
+    return this.request('/user/count', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
     });
   }
 }

@@ -1,6 +1,8 @@
 import productModel from "../models/productmodel.js";
 import path from "path";
 import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import connectCloudinary from "../config/cloudinary.js";
 
 // Function to add a product
 const addProduct = async (req, res) => {
@@ -30,38 +32,35 @@ const addProduct = async (req, res) => {
             });
         }
 
-        // Save images locally and get URLs
+        // Save images to Cloudinary and get URLs
         const imagesUrl = [];
         
         for (let i = 0; i < images.length; i++) {
             const item = images[i];
             try {
-                // Create uploads directory if it doesn't exist
-                const uploadsDir = path.join(process.cwd(), 'uploads');
-                if (!fs.existsSync(uploadsDir)) {
-                    fs.mkdirSync(uploadsDir, { recursive: true });
-                }
+                // Upload to Cloudinary
+                const result = await new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'ssc-products',
+                            public_id: `product_${Date.now()}_${i}`,
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    uploadStream.end(item.buffer);
+                });
 
-                // Generate unique filename
-                const timestamp = Date.now();
-                const randomNum = Math.floor(Math.random() * 1000);
-                const fileExtension = path.extname(item.originalname);
-                const fileName = `product_${timestamp}_${randomNum}_${i}${fileExtension}`;
-                const filePath = path.join(uploadsDir, fileName);
-
-                // Copy file to uploads directory
-                fs.copyFileSync(item.path, filePath);
-
-                // Return the URL that can be accessed from the frontend
-                const imageUrl = `http://localhost:4000/uploads/${fileName}`;
+                const imageUrl = result.secure_url;
                 imagesUrl.push(imageUrl);
-                
-                console.log(`✅ Image ${i + 1} uploaded: ${imageUrl}`);
+                console.log(`✅ Image ${i + 1} uploaded to Cloudinary: ${imageUrl}`);
                 
             } catch (uploadError) {
-                console.error(`❌ File upload error for image ${i + 1}:`, uploadError);
+                console.error(`❌ Cloudinary upload error for image ${i + 1}:`, uploadError);
                 // Fallback to placeholder if upload fails
-                imagesUrl.push("https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center");
+                imagesUrl.push("https://placehold.co/400x400?text=Image+Not+Available");
             }
         }
 
@@ -191,4 +190,61 @@ const SingleProduct = async (req, res) => {
     }
 };
 
-export { SingleProduct, addProduct, removeProduct, listProduct };
+// Function to update a product
+const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
+
+        console.log("🔍 Update product request received");
+        console.log("📝 Product ID:", id);
+        console.log("📝 Update data:", req.body);
+
+        if (!id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Product ID is required" 
+            });
+        }
+
+        // Find the product
+        const product = await productModel.findById(id);
+        
+        if (!product) {
+            console.log("❌ Product not found with ID:", id);
+            return res.status(404).json({ 
+                success: false, 
+                message: "Product not found" 
+            });
+        }
+
+        // Update fields
+        if (name) product.name = name;
+        if (description !== undefined) product.description = description;
+        if (price !== undefined) product.price = Number(price);
+        if (category) product.category = category;
+        if (subCategory) product.subCategory = subCategory;
+        if (sizes) product.sizes = Array.isArray(sizes) ? sizes : JSON.parse(sizes);
+        if (bestseller !== undefined) product.bestseller = bestseller;
+
+        // Save the updated product
+        await product.save();
+
+        console.log("✅ Product updated successfully:", product.name);
+        
+        res.status(200).json({ 
+            success: true, 
+            message: "Product updated successfully",
+            product 
+        });
+    } catch (error) {
+        console.error("❌ Update product error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error",
+            error: error.message 
+        });
+    }
+};
+
+export { SingleProduct, addProduct, removeProduct, listProduct, updateProduct };

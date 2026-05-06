@@ -1,12 +1,14 @@
 import orderModel from "../models/orderModel.js"
 import userModel from "../models/usermodel.js"
+import { notifyNewOrder, notifyOrderCancelled, notifyOrderDelivered } from "./notificationcontroller.js"
+import { incrementCouponUsage } from "./couponcontroller.js"
 
 
 // Placing orders using COD Method
 const placeOrder = async (req,res) => {
 
     try{
-        const { items, amount, address} = req.body;
+        const { items, amount, address, coupon } = req.body;
         const userId = req.user._id; // Get userId from auth middleware (req.user)
 
         if (!userId) {
@@ -20,15 +22,27 @@ const placeOrder = async (req,res) => {
             userId,
             items,
             amount,
-            totalAmount: amount, // Add totalAmount field
+            totalAmount: amount,
             address,
             paymentMethod:"COD",
             payment:false,
             date : Date.now()
         }
 
+        if (coupon) {
+            orderData.couponCode = coupon;
+            await incrementCouponUsage(coupon);
+        }
+
         const newOrder = new orderModel(orderData)
         await newOrder.save()
+
+        // Create notification for new order
+        await notifyNewOrder({
+            orderId: newOrder._id,
+            userId: userId,
+            amount: amount
+        });
 
         await userModel.findByIdAndUpdate(userId,{cartData:{}})
 
@@ -103,6 +117,20 @@ const updateStatus = async (req,res) => {
             });
         }
 
+        if (status === 'Cancelled') {
+            await notifyOrderCancelled({
+                orderId: updatedOrder._id,
+                userId: updatedOrder.userId,
+                amount: updatedOrder.amount
+            });
+        } else if (status === 'Delivered') {
+            await notifyOrderDelivered({
+                orderId: updatedOrder._id,
+                userId: updatedOrder.userId,
+                amount: updatedOrder.amount
+            });
+        }
+
         res.json({
             success: true,
             message: "Order status updated successfully",
@@ -118,5 +146,82 @@ const updateStatus = async (req,res) => {
     }
 }
 
+const trackOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const userId = req.user._id;
 
-export{placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
+        const order = await orderModel.findOne({ _id: orderId, userId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        const statusTimeline = [
+            { status: 'Order Placed', date: order.date, completed: true },
+            { status: 'Processing', date: order.date, completed: ['Processing', 'Shipped', 'Delivered'].includes(order.status) },
+            { status: 'Shipped', date: order.shippedDate || order.date, completed: ['Shipped', 'Delivered'].includes(order.status) },
+            { status: 'Delivered', date: order.deliveredDate || null, completed: order.status === 'Delivered' },
+        ];
+
+        const estimatedDelivery = new Date(order.date);
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + 7);
+
+        res.json({
+            success: true,
+            order: {
+                id: order._id,
+                status: order.status,
+                items: order.items,
+                amount: order.amount,
+                address: order.address,
+                paymentMethod: order.paymentMethod,
+                date: order.date,
+                estimatedDelivery,
+            },
+            timeline: statusTimeline
+        });
+    } catch (error) {
+        console.error("Track order error:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+const getOrderByTrackingId = async (req, res) => {
+    try {
+        const { trackingId } = req.params;
+        const order = await orderModel.findById(trackingId);
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        const statusTimeline = [
+            { status: 'Order Placed', date: order.date, completed: true },
+            { status: 'Processing', date: order.date, completed: ['Processing', 'Shipped', 'Delivered'].includes(order.status) },
+            { status: 'Shipped', date: order.shippedDate || order.date, completed: ['Shipped', 'Delivered'].includes(order.status) },
+            { status: 'Delivered', date: order.deliveredDate || null, completed: order.status === 'Delivered' },
+        ];
+
+        const estimatedDelivery = new Date(order.date);
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + 7);
+
+        res.json({
+            success: true,
+            order: {
+                id: order._id,
+                status: order.status,
+                amount: order.amount,
+                paymentMethod: order.paymentMethod,
+                date: order.date,
+                estimatedDelivery,
+            },
+            timeline: statusTimeline
+        });
+    } catch (error) {
+        console.error("Get order by tracking ID error:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+
+export{placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, trackOrder, getOrderByTrackingId}

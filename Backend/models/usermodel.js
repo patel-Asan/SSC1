@@ -12,6 +12,16 @@ const userSchema = new mongoose.Schema({
         zipcode: { type: String, default: "" },
         country: { type: String, default: "" }
     },
+    addresses: [{
+        label: { type: String, default: "Home" },
+        street: { type: String, default: "" },
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        zipcode: { type: String, default: "" },
+        country: { type: String, default: "" },
+        phone: { type: String, default: "" },
+        isDefault: { type: Boolean, default: false }
+    }],
     cartData: { type: Object, default: {} },
     status: { 
         type: String, 
@@ -22,7 +32,13 @@ const userSchema = new mongoose.Schema({
         type: String, 
         enum: ['user', 'admin'], 
         default: 'user' 
-    }
+    },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
+    recentlyViewed: [{
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
+        viewedAt: { type: Date, default: Date.now }
+    }]
 }, { 
     minimize: false,
     timestamps: true 

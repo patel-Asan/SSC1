@@ -5,6 +5,7 @@ import adminApi from "../services/adminApi.js";
 const Users = ({ token }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = window.innerWidth <= 768;
 
   const fetchUsers = async () => {
     try {
@@ -58,16 +59,17 @@ const Users = ({ token }) => {
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>User Management ({users.length} users)</h1>
+    <div style={{ padding: isMobile ? "16px" : "20px" }}>
+      <h1 style={{ fontSize: isMobile ? "1.25rem" : "1.5rem" }}>User Management ({users.length} users)</h1>
       
       <div style={{
         backgroundColor: "#ffffff",
         borderRadius: "12px",
-        padding: "24px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+        padding: isMobile ? "16px" : "24px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        overflowX: "auto"
       }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: isMobile ? "600px" : "auto" }}>
           <thead>
             <tr>
               <th style={{ padding: "12px", textAlign: "left", borderBottom: "1px solid #e5e7eb" }}>User</th>
