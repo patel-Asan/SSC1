@@ -191,7 +191,6 @@ const Dashboard = ({ token }) => {
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
         marginBottom: "32px",
         flexDirection: isMobile ? "column" : "row",
         gap: isMobile ? "16px" : "0",
