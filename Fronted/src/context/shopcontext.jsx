@@ -120,14 +120,17 @@ const ShopContextProvider = (props) => {
       setError(null);
       const response = await apiService.getProducts();
       if (response.success) {
-        setProducts(response.products);
-        console.log("✅ Products loaded from API:", response.products.length);
+        const normalized = response.products.map(p => ({
+          ...p,
+          image: typeof p.image === 'string' ? p.image.split(',').filter(Boolean) : (Array.isArray(p.image) ? p.image : [])
+        }));
+        setProducts(normalized);
+        console.log("✅ Products loaded from API:", normalized.length);
       } else {
         throw new Error(response.message || 'Failed to fetch products');
       }
     } catch (error) {
       console.error('Error fetching products from API:', error);
-      // setProducts(staticProducts); // Uncomment if using fallback
       setError("Using offline data - API connection failed");
       toast.warning("Using offline data - API connection failed");
     } finally {
