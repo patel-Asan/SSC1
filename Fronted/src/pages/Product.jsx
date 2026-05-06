@@ -45,10 +45,15 @@ const Product = () => {
     const fetchProductData = () => {
       const foundProduct = getProductById(productId);
       if (foundProduct) {
-        setProductData(foundProduct);
-        const firstImage = Array.isArray(foundProduct.image) && foundProduct.image.length > 0 
-          ? foundProduct.image[0] 
-          : "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center";
+        const normalizedProduct = { ...foundProduct };
+        if (typeof normalizedProduct.image === 'string') {
+          normalizedProduct.image = normalizedProduct.image.split(',').filter(Boolean);
+        }
+        if (!Array.isArray(normalizedProduct.image) || normalizedProduct.image.length === 0) {
+          normalizedProduct.image = ["https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop&crop=center"];
+        }
+        setProductData(normalizedProduct);
+        const firstImage = normalizedProduct.image[0];
         setImage(firstImage);
         setIsWishlisted(isInWishlist(foundProduct._id));
       }
