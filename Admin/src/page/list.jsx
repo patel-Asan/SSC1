@@ -34,8 +34,12 @@ const List = ({ token }) => {
       const response = await apiService.getProducts();
       
       if (response.success) {
-        setList(response.products);
-        setFilteredList(response.products);
+        const normalized = response.products.map(p => ({
+          ...p,
+          image: typeof p.image === 'string' ? p.image.split(',').filter(Boolean) : (Array.isArray(p.image) ? p.image : [])
+        }));
+        setList(normalized);
+        setFilteredList(normalized);
       } else {
         toast.error(response.message || "Failed to fetch products");
       }
@@ -56,8 +60,8 @@ const List = ({ token }) => {
     }
     
     try {
-      // Direct fetch call to bypass any API service issues
-      const response = await fetch('http://localhost:4000/api/product/remove', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+      const response = await fetch(`${backendUrl}/api/product/remove`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
