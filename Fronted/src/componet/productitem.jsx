@@ -148,7 +148,7 @@ const Productitem = ({ id, name, image, price, product }) => {
           style={{
             width: "100%",
             height: isMobile ? "200px" : "280px",
-            objectFit: "cover",
+            objectFit: "contain",
             cursor: "pointer",
           }}
           whileHover={{ scale: 1.05 }}

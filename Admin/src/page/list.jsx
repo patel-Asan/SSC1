@@ -442,7 +442,7 @@ const List = ({ token }) => {
                     style={{
                       width: "100%",
                       height: "200px",
-                      objectFit: "cover",
+                      objectFit: "contain",
                       borderRadius: "16px"
                     }}
                     onError={(e) => {

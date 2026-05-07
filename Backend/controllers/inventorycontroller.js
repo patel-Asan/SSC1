@@ -5,12 +5,23 @@ const getLowStockProducts = async (req, res) => {
     try {
         const { threshold = 10 } = req.query;
         
-        const lowStockProducts = await productmodel.find({
+        let lowStockProducts = await productmodel.find({
             $or: [
                 { stock: { $lt: parseInt(threshold) } },
                 { stock: { $exists: false } }
             ]
         }).sort({ stock: 1 });
+
+        lowStockProducts = lowStockProducts.map(p => {
+            const obj = p.toObject();
+            if (typeof obj.image === 'string') {
+                obj.image = obj.image.split(',').filter(Boolean);
+            }
+            if (!Array.isArray(obj.image)) {
+                obj.image = [];
+            }
+            return obj;
+        });
 
         res.status(200).json({
             success: true,

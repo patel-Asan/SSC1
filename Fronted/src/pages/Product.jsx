@@ -498,7 +498,7 @@ const Product = () => {
                 src={image}
                 alt="Main Product"
                 style={{ 
-                  maxHeight: isMobile ? "280px" : "450px", 
+                  maxHeight: isMobile ? "280px" : "1000px", 
                   width: "100%", 
                   objectFit: "contain",
                   transition: "transform 0.3s ease",
@@ -540,8 +540,8 @@ const Product = () => {
                     src={getImageSrc(item, index)}
                     alt={`Thumbnail ${index}`}
                     style={{ 
-                      width: isMobile ? "60px" : "80px", 
-                      height: isMobile ? "60px" : "80px", 
+                      width: isMobile ? "60px" : "140px", 
+                      height: isMobile ? "60px" : "140px", 
                       objectFit: "cover", 
                       display: "block" 
                     }}
@@ -854,25 +854,7 @@ const Product = () => {
                 {isAdding ? "✓ Added!" : "🛒 Add to Cart"}
               </motion.button>
               
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 6px 20px rgba(31,41,55,0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  flex: 1,
-                  padding: isMobile ? "16px 24px" : "18px 32px",
-                  backgroundColor: "#1f2937",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "14px",
-                  fontWeight: "700",
-                  fontSize: isMobile ? "15px" : "16px",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                }}
-              >
-                ⚡ Buy Now
-              </motion.button>
+              
             </motion.div>
 
             {/* Delivery Info */}

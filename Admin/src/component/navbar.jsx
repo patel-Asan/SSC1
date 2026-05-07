@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Bell, User, LogOut, Package, CheckCircle, XCircle, UserPlus, Truck, Trash2, Check, Menu } from "lucide-react";
+import { Bell, User, LogOut, Package, CheckCircle, XCircle, UserPlus, Trash2, Check, Menu, Shield } from "lucide-react";
 import { toast } from "react-toastify";
 
 const Navbar = ({ setToken, setSidebarOpen }) => {
-  const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const isMobile = window.innerWidth <= 768;
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
-  // Fetch notifications
   const fetchNotifications = async () => {
     try {
       const response = await fetch(`${backendUrl}/api/notification/list`, {
-        headers: {
-          'token': localStorage.getItem('token')
-        }
+        headers: { 'token': localStorage.getItem('token') }
       });
       const data = await response.json();
       if (data.success) {
@@ -30,14 +25,11 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  // Mark notification as read
   const markAsRead = async (id) => {
     try {
       const response = await fetch(`${backendUrl}/api/notification/read/${id}`, {
         method: 'PUT',
-        headers: {
-          'token': localStorage.getItem('token')
-        }
+        headers: { 'token': localStorage.getItem('token') }
       });
       const data = await response.json();
       if (data.success) {
@@ -49,14 +41,11 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  // Mark all as read
   const markAllAsRead = async () => {
     try {
       const response = await fetch(`${backendUrl}/api/notification/read-all`, {
         method: 'PUT',
-        headers: {
-          'token': localStorage.getItem('token')
-        }
+        headers: { 'token': localStorage.getItem('token') }
       });
       const data = await response.json();
       if (data.success) {
@@ -69,14 +58,11 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  // Delete notification
   const deleteNotification = async (id) => {
     try {
       const response = await fetch(`${backendUrl}/api/notification/delete/${id}`, {
         method: 'DELETE',
-        headers: {
-          'token': localStorage.getItem('token')
-        }
+        headers: { 'token': localStorage.getItem('token') }
       });
       const data = await response.json();
       if (data.success) {
@@ -91,9 +77,8 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  // Get notification icon based on type
   const getNotificationIcon = (type) => {
-    const iconStyle = { size: 18 };
+    const iconStyle = { size: 16 };
     switch (type) {
       case 'order': return <Package {...iconStyle} color="#8b5cf6" />;
       case 'user': return <UserPlus {...iconStyle} color="#3b82f6" />;
@@ -103,38 +88,33 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  // Get notification background color
   const getNotificationBg = (type) => {
     switch (type) {
-      case 'order': return "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(167,139,250,0.1) 100%)";
-      case 'user': return "linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(96,165,250,0.1) 100%)";
-      case 'cancel': return "linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(248,113,113,0.1) 100%)";
-      case 'delivery': return "linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(52,211,153,0.1) 100%)";
-      default: return "linear-gradient(135deg, rgba(107,114,128,0.1) 0%, rgba(156,163,175,0.1) 100%)";
+      case 'order': return "linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(167,139,250,0.08) 100%)";
+      case 'user': return "linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(96,165,250,0.08) 100%)";
+      case 'cancel': return "linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(248,113,113,0.08) 100%)";
+      case 'delivery': return "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(52,211,153,0.08) 100%)";
+      default: return "linear-gradient(135deg, rgba(107,114,128,0.08) 0%, rgba(156,163,175,0.08) 100%)";
     }
   };
 
-  // Format relative time
   const getRelativeTime = (date) => {
     const now = new Date();
     const notifDate = new Date(date);
-    const diff = (now - notifDate) / 1000; // seconds
-
+    const diff = (now - notifDate) / 1000;
     if (diff < 60) return 'Just now';
     if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
     return notifDate.toLocaleDateString();
   };
 
   useEffect(() => {
     fetchNotifications();
-    // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showNotifications && !e.target.closest('.notification-container')) {
@@ -146,156 +126,150 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
   }, [showNotifications]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: isMobile ? "12px 16px" : "16px 32px",
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-        color: "white",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
-        flexWrap: "wrap",
-        gap: "12px",
-      }}
-    >
-      {/* Left - Hamburger + Breadcrumb */}
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: isMobile ? "12px 16px" : "14px 28px",
+      background: "#fff",
+      borderBottom: "1px solid #e5e7eb",
+      gap: "12px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+      position: "sticky",
+      top: 0,
+      zIndex: 50,
+    }}>
+      {/* Left */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         {isMobile && (
           <button
             onClick={() => setSidebarOpen(true)}
             style={{
-              background: "rgba(255,255,255,0.1)",
+              background: "none",
               border: "none",
               borderRadius: "8px",
-              width: "40px",
-              height: "40px",
+              width: "36px",
+              height: "36px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              color: "white",
+              color: "#374151",
               flexShrink: 0,
             }}
           >
             <Menu size={20} />
           </button>
         )}
-        <div
-          style={{
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "8px",
+            background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            padding: isMobile ? "6px 12px" : "8px 16px",
-            backgroundColor: "rgba(255,255,255,0.05)",
-            borderRadius: "10px",
-          }}
-        >
-          <span style={{ fontSize: isMobile ? "12px" : "14px", color: "rgba(255,255,255,0.6)" }}>
-            Welcome back,
-          </span>
-          <span style={{ fontSize: isMobile ? "12px" : "14px", fontWeight: "600", color: "#fff" }}>
-            Admin
-          </span>
+            justifyContent: "center",
+            flexShrink: 0,
+          }}>
+            <Shield size={16} color="white" />
+          </div>
+          <div>
+            <div style={{ fontSize: isMobile ? "13px" : "14px", fontWeight: "600", color: "#111827" }}>
+              Welcome back, Admin
+            </div>
+            <div style={{ fontSize: "11px", color: "#9ca3af" }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right - Actions */}
-      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "10px" : "16px" }}>
-        {/* Notification */}
+      {/* Right */}
+      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "8px" : "12px" }}>
+        {/* Notifications */}
         <div className="notification-container" style={{ position: "relative" }}>
-          <div
+          <button
             onClick={() => setShowNotifications(!showNotifications)}
             style={{
               position: "relative",
-              padding: "10px",
-              backgroundColor: showNotifications ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+              padding: "8px",
+              background: showNotifications ? "#f3f4f6" : "transparent",
               borderRadius: "10px",
               cursor: "pointer",
-              transition: "all 0.3s ease",
+              border: "none",
+              transition: "all 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              if (!showNotifications) {
-                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
-              }
+              if (!showNotifications) e.currentTarget.style.background = "#f3f4f6";
             }}
             onMouseLeave={(e) => {
-              if (!showNotifications) {
-                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
-              }
+              if (!showNotifications) e.currentTarget.style.background = "transparent";
             }}
           >
-            <Bell size={20} color="rgba(255,255,255,0.8)" />
-            {/* Notification Badge */}
+            <Bell size={20} color="#374151" />
             {unreadCount > 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "4px",
-                  right: "4px",
-                  minWidth: "18px",
-                  height: "18px",
-                  backgroundColor: "#ff6f61",
-                  borderRadius: "50%",
-                  border: "2px solid #0f172a",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: "700",
-                  padding: "0 4px",
-                }}
-              >
+              <div style={{
+                position: "absolute",
+                top: "3px",
+                right: "3px",
+                minWidth: "16px",
+                height: "16px",
+                backgroundColor: "#ef4444",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "10px",
+                fontWeight: "700",
+                color: "#fff",
+                padding: "0 3px",
+                boxShadow: "0 2px 4px rgba(239,68,68,0.3)",
+              }}>
                 {unreadCount > 99 ? '99+' : unreadCount}
               </div>
             )}
-          </div>
+          </button>
 
-          {/* Notification Dropdown */}
           {showNotifications && (
-            <div
-              style={{
-                position: "absolute",
-                top: "calc(100% + 12px)",
-                right: isMobile ? "-60px" : "0",
-                width: isMobile ? "300px" : "380px",
-                maxHeight: "500px",
-                background: "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
-                borderRadius: "16px",
-                boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
-                zIndex: 1000,
-                overflow: "hidden",
-              }}
-            >
+            <div style={{
+              position: "absolute",
+              top: "calc(100% + 8px)",
+              right: isMobile ? "-40px" : "0",
+              width: isMobile ? "320px" : "380px",
+              maxHeight: "480px",
+              background: "#fff",
+              borderRadius: "16px",
+              boxShadow: "0 25px 60px rgba(0,0,0,0.15)",
+              zIndex: 1000,
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+            }}>
               {/* Header */}
-              <div
-                style={{
-                  padding: "16px 20px",
-                  borderBottom: "1px solid #f3f4f6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
+              <div style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid #f3f4f6",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>
                     <Bell size={16} color="white" />
                   </div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "700", color: "#1f2937" }}>
+                    <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#111827" }}>
                       Notifications
                     </h3>
-                    <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "#6b7280" }}>
+                    <p style={{ margin: "1px 0 0 0", fontSize: "12px", color: "#6b7280" }}>
                       {unreadCount} unread
                     </p>
                   </div>
@@ -304,7 +278,7 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                   <button
                     onClick={markAllAsRead}
                     style={{
-                      padding: "6px 12px",
+                      padding: "6px 10px",
                       background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
                       color: "white",
                       border: "none",
@@ -322,34 +296,22 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                 )}
               </div>
 
-              {/* Notifications List */}
-              <div style={{ maxHeight: "380px", overflowY: "auto" }}>
+              {/* List */}
+              <div style={{ maxHeight: "360px", overflowY: "auto" }}>
                 {notifications.length === 0 ? (
-                  <div
-                    style={{
-                      padding: "40px 20px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        borderRadius: "50%",
-                        background: "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        margin: "0 auto 16px",
-                      }}
-                    >
-                      <Bell size={24} color="#9ca3af" />
+                  <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                    <div style={{
+                      width: "56px", height: "56px", borderRadius: "50%",
+                      background: "#f3f4f6", display: "flex", alignItems: "center",
+                      justifyContent: "center", margin: "0 auto 12px"
+                    }}>
+                      <Bell size={22} color="#9ca3af" />
                     </div>
                     <p style={{ margin: 0, fontSize: "14px", color: "#6b7280", fontWeight: "500" }}>
                       No notifications yet
                     </p>
                     <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#9ca3af" }}>
-                      New orders and user registrations will appear here
+                      New orders and registrations appear here
                     </p>
                   </div>
                 ) : (
@@ -358,9 +320,9 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                       key={notification._id}
                       onClick={() => !notification.isRead && markAsRead(notification._id)}
                       style={{
-                        padding: "14px 20px",
+                        padding: "12px 16px",
                         borderBottom: "1px solid #f3f4f6",
-                        background: notification.isRead ? "#ffffff" : getNotificationBg(notification.type),
+                        background: notification.isRead ? "#fff" : getNotificationBg(notification.type),
                         cursor: notification.isRead ? "default" : "pointer",
                         transition: "all 0.2s ease",
                         display: "flex",
@@ -369,7 +331,7 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                       }}
                       onMouseEnter={(e) => {
                         if (!notification.isRead) {
-                          e.currentTarget.style.background = getNotificationBg(notification.type).replace('0.1)', '0.15)');
+                          e.currentTarget.style.background = getNotificationBg(notification.type).replace('0.08)', '0.12)');
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -378,56 +340,29 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                         }
                       }}
                     >
-                      {/* Icon */}
-                      <div
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "10px",
-                          background: notification.isRead ? "#f3f4f6" : "#ffffff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                        }}
-                      >
+                      <div style={{
+                        width: "34px", height: "34px", borderRadius: "10px",
+                        background: notification.isRead ? "#f3f4f6" : "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        flexShrink: 0, boxShadow: notification.isRead ? "none" : "0 1px 3px rgba(0,0,0,0.06)",
+                      }}>
                         {getNotificationIcon(notification.type)}
                       </div>
-
-                      {/* Content */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: "13px",
-                              fontWeight: notification.isRead ? "500" : "700",
-                              color: notification.isRead ? "#6b7280" : "#1f2937",
-                              flex: 1,
-                            }}
-                          >
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "2px" }}>
+                          <p style={{
+                            margin: 0, fontSize: "13px",
+                            fontWeight: notification.isRead ? "500" : "700",
+                            color: notification.isRead ? "#6b7280" : "#111827",
+                            flex: 1,
+                          }}>
                             {notification.title}
                           </p>
                           {!notification.isRead && (
-                            <div
-                              style={{
-                                width: "8px",
-                                height: "8px",
-                                borderRadius: "50%",
-                                background: "#ff6f61",
-                                flexShrink: 0,
-                              }}
-                            />
+                            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#ff6f61", flexShrink: 0 }} />
                           )}
                         </div>
-                        <p
-                          style={{
-                            margin: "0 0 4px 0",
-                            fontSize: "12px",
-                            color: "#6b7280",
-                            lineHeight: 1.4,
-                          }}
-                        >
+                        <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#6b7280", lineHeight: 1.35 }}>
                           {notification.message}
                         </p>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -435,17 +370,10 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                             {getRelativeTime(notification.createdAt)}
                           </span>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteNotification(notification._id);
-                            }}
+                            onClick={(e) => { e.stopPropagation(); deleteNotification(notification._id); }}
                             style={{
-                              padding: "4px",
-                              background: "transparent",
-                              border: "none",
-                              cursor: "pointer",
-                              borderRadius: "4px",
-                              opacity: 0.5,
+                              padding: "3px", background: "transparent", border: "none",
+                              cursor: "pointer", borderRadius: "4px", opacity: 0.4,
                               transition: "all 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
@@ -453,11 +381,11 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                               e.currentTarget.style.background = "#fee2e2";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.opacity = "0.5";
+                              e.currentTarget.style.opacity = "0.4";
                               e.currentTarget.style.background = "transparent";
                             }}
                           >
-                            <Trash2 size={14} color="#ef4444" />
+                            <Trash2 size={13} color="#ef4444" />
                           </button>
                         </div>
                       </div>
@@ -466,17 +394,12 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                 )}
               </div>
 
-              {/* Footer */}
               {notifications.length > 0 && (
-                <div
-                  style={{
-                    padding: "12px 20px",
-                    borderTop: "1px solid #f3f4f6",
-                    background: "#f9fafb",
-                    textAlign: "center",
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: "12px", color: "#9ca3af" }}>
+                <div style={{
+                  padding: "10px 16px", borderTop: "1px solid #f3f4f6",
+                  background: "#f9fafb", textAlign: "center",
+                }}>
+                  <p style={{ margin: 0, fontSize: "11px", color: "#9ca3af" }}>
                     Showing last {notifications.length} notifications
                   </p>
                 </div>
@@ -485,46 +408,38 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
           )}
         </div>
 
-        {/* Profile / Logout */}
-        <div style={{ position: "relative" }}>
-          <div
-            onClick={() => setToken('')}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: isMobile ? "8px" : "8px 12px",
-              background: "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
-              borderRadius: "12px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.boxShadow = "0 4px 15px rgba(255,111,97,0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <div
-              style={{
-                width: "32px",
-                height: "32px",
-                backgroundColor: "rgba(255,255,255,0.2)",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <User size={18} color="#fff" />
-            </div>
-            {!isMobile && <span style={{ fontSize: "14px", fontWeight: "600" }}>Logout</span>}
-            {!isMobile && <LogOut size={16} />}
+        {/* Logout */}
+        <button
+          onClick={() => setToken('')}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: isMobile ? "8px" : "8px 14px",
+            background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+            borderRadius: "10px",
+            cursor: "pointer",
+            border: "none",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.02)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(239,68,68,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          <div style={{
+            width: "28px", height: "28px", borderRadius: "7px",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <LogOut size={14} color="white" />
           </div>
-        </div>
+          {!isMobile && <span style={{ fontSize: "13px", fontWeight: "600", color: "#991b1b" }}>Logout</span>}
+        </button>
       </div>
     </div>
   );

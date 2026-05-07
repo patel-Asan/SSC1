@@ -2,21 +2,19 @@ import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   PlusCircle,
-  ListOrdered,
   ShoppingCart,
   LayoutDashboard,
   Package,
-  TrendingUp,
   MessageSquare,
   BarChart3,
   X,
-  Menu,
   Tag,
   Warehouse,
   Star,
   TicketPercent,
   UserCheck,
   Mail,
+  Shield
 } from "lucide-react";
 
 const Side = ({ sidebarOpen, setSidebarOpen }) => {
@@ -42,67 +40,71 @@ const Side = ({ sidebarOpen, setSidebarOpen }) => {
     { path: "/newsletter", icon: Mail, label: "Newsletter" },
   ];
 
+  const sidebarWidth = "260px";
+
   const containerStyle = {
-    width: isMobile ? (sidebarOpen ? "260px" : "0px") : "240px",
-    minHeight: "100vh",
-    background: "linear-gradient(180deg, #1e1e2f 0%, #16162a 100%)",
-    padding: isMobile ? (sidebarOpen ? "24px 16px" : "0") : "24px 16px",
+    width: isMobile ? (sidebarOpen ? sidebarWidth : "0px") : sidebarWidth,
+    height: isMobile ? "100vh" : "100vh",
+    background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+    padding: isMobile ? (sidebarOpen ? "20px 14px" : "0") : "20px 14px",
     display: "flex",
     flexDirection: "column",
-    boxShadow: isMobile && sidebarOpen ? "4px 0 30px rgba(0, 0, 0, 0.5)" : "4px 0 20px rgba(0, 0, 0, 0.3)",
+    boxShadow: isMobile && sidebarOpen
+      ? "4px 0 40px rgba(0,0,0,0.6)"
+      : "2px 0 20px rgba(0,0,0,0.08)",
     position: isMobile ? "fixed" : "sticky",
     top: 0,
     left: 0,
+    alignSelf: "flex-start",
     zIndex: isMobile ? 10000 : 100,
     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     overflow: "hidden",
     opacity: isMobile && !sidebarOpen ? 0 : 1,
-  };
-
-  const logoContainerStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "12px",
-    padding: "0 8px 24px 8px",
-    marginBottom: "16px",
-    borderBottom: "1px solid rgba(255,255,255,0.1)",
-  };
-
-  const logoIconStyle = {
-    width: "44px",
-    height: "44px",
-    borderRadius: "12px",
-    background: "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "24px",
     flexShrink: 0,
   };
 
-  const logoTextStyle = {
-    fontSize: "20px",
-    color: "#fff",
-    fontWeight: "700",
-    letterSpacing: "0.5px",
-  };
+  const renderNavItem = (item) => {
+    const isActive = location.pathname === item.path;
+    const isHovered = hoveredItem === item.path;
 
-  const logoSubtextStyle = {
-    fontSize: "12px",
-    color: "rgba(255,255,255,0.6)",
-    fontWeight: "500",
-  };
-
-  const menuLabelStyle = {
-    fontSize: "11px",
-    color: "rgba(255,255,255,0.4)",
-    textTransform: "uppercase",
-    letterSpacing: "1.5px",
-    fontWeight: "600",
-    padding: "0 12px",
-    marginBottom: "12px",
-    marginTop: "8px",
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        onClick={() => isMobile && setSidebarOpen(false)}
+        onMouseEnter={() => setHoveredItem(item.path)}
+        onMouseLeave={() => setHoveredItem(null)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "11px 14px",
+          borderRadius: "10px",
+          color: isActive ? "#fff" : "rgba(255,255,255,0.6)",
+          textDecoration: "none",
+          fontWeight: isActive ? "600" : "400",
+          fontSize: "14px",
+          background: isActive
+            ? "linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(255,111,97,0.2) 100%)"
+            : isHovered
+            ? "rgba(255,255,255,0.06)"
+            : "transparent",
+          borderLeft: isActive ? "3px solid #ff6f61" : "3px solid transparent",
+          transition: "all 0.25s ease",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <item.icon
+          size={19}
+          style={{
+            color: isActive ? "#a78bfa" : isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)",
+            transition: "color 0.25s ease",
+            flexShrink: 0,
+          }}
+        />
+        <span>{item.label}</span>
+      </NavLink>
+    );
   };
 
   return (
@@ -116,201 +118,128 @@ const Side = ({ sidebarOpen, setSidebarOpen }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(0,0,0,0.6)",
             zIndex: 9999,
+            backdropFilter: "blur(4px)",
           }}
         />
       )}
       <div style={containerStyle}>
-        <div style={logoContainerStyle}>
+        {/* Logo */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 4px 20px 4px",
+          marginBottom: "16px",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={logoIconStyle}>👑</div>
+            <div style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
+            }}>
+              <Shield size={22} color="white" />
+            </div>
             <div>
-              <div style={logoTextStyle}>SSC Admin</div>
-              <div style={logoSubtextStyle}>Management</div>
+              <div style={{ fontSize: "18px", color: "#fff", fontWeight: "700", letterSpacing: "0.3px", lineHeight: 1.2 }}>
+                SSC Admin
+              </div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", fontWeight: "500" }}>
+                Management
+              </div>
             </div>
           </div>
           {isMobile && (
             <button
               onClick={() => setSidebarOpen(false)}
               style={{
-                background: "rgba(255,255,255,0.1)",
+                background: "rgba(255,255,255,0.06)",
                 border: "none",
                 borderRadius: "8px",
-                width: "36px",
-                height: "36px",
+                width: "32px",
+                height: "32px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                color: "white",
+                color: "rgba(255,255,255,0.6)",
+                flexShrink: 0,
               }}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           )}
         </div>
 
-        <div style={menuLabelStyle}>Main Menu</div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", overflowY: "auto" }}>
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const isHovered = hoveredItem === item.path;
-
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => isMobile && setSidebarOpen(false)}
-                onMouseEnter={() => setHoveredItem(item.path)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                  padding: "14px 16px",
-                  borderRadius: "12px",
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.7)",
-                  textDecoration: "none",
-                  fontWeight: isActive ? "600" : "500",
-                  fontSize: "15px",
-                  background: isActive
-                    ? "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)"
-                    : isHovered
-                    ? "rgba(255,111,97,0.15)"
-                    : "transparent",
-                  transform: isActive ? "translateX(6px)" : isHovered ? "translateX(3px)" : "translateX(0)",
-                  boxShadow: isActive ? "0 4px 15px rgba(255,111,97,0.3)" : "none",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  position: "relative",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {isActive && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "0",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: "3px",
-                      height: "24px",
-                      backgroundColor: "#fff",
-                      borderRadius: "0 3px 3px 0",
-                    }}
-                  />
-                )}
-
-                <item.icon
-                  size={20}
-                  style={{
-                    color: isActive ? "#fff" : isHovered ? "#ff6f61" : "rgba(255,255,255,0.7)",
-                    transition: "color 0.3s ease",
-                    flexShrink: 0,
-                  }}
-                />
-                <span>{item.label}</span>
-
-                {isActive && (
-                  <span style={{ marginLeft: "auto", fontSize: "12px" }}>›</span>
-                )}
-              </NavLink>
-            );
-          })}
+        {/* Navigation */}
+        <div style={{
+          fontSize: "10px",
+          color: "rgba(255,255,255,0.3)",
+          textTransform: "uppercase",
+          letterSpacing: "1.2px",
+          fontWeight: "600",
+          padding: "0 14px",
+          marginBottom: "10px",
+        }}>
+          Main Menu
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflowY: "auto", marginBottom: "20px" }}>
+          {navItems.map(renderNavItem)}
         </div>
 
-        <div style={menuLabelStyle}>Management</div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", overflowY: "auto" }}>
-          {managementItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const isHovered = hoveredItem === item.path;
-
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => isMobile && setSidebarOpen(false)}
-                onMouseEnter={() => setHoveredItem(item.path)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                  padding: "14px 16px",
-                  borderRadius: "12px",
-                  color: isActive ? "#fff" : "rgba(255,255,255,0.7)",
-                  textDecoration: "none",
-                  fontWeight: isActive ? "600" : "500",
-                  fontSize: "15px",
-                  background: isActive
-                    ? "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)"
-                    : isHovered
-                    ? "rgba(255,111,97,0.15)"
-                    : "transparent",
-                  transform: isActive ? "translateX(6px)" : isHovered ? "translateX(3px)" : "translateX(0)",
-                  boxShadow: isActive ? "0 4px 15px rgba(255,111,97,0.3)" : "none",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  position: "relative",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {isActive && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "0",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: "3px",
-                      height: "24px",
-                      backgroundColor: "#fff",
-                      borderRadius: "0 3px 3px 0",
-                    }}
-                  />
-                )}
-
-                <item.icon
-                  size={20}
-                  style={{
-                    color: isActive ? "#fff" : isHovered ? "#ff6f61" : "rgba(255,255,255,0.7)",
-                    transition: "color 0.3s ease",
-                    flexShrink: 0,
-                  }}
-                />
-                <span>{item.label}</span>
-
-                {isActive && (
-                  <span style={{ marginLeft: "auto", fontSize: "12px" }}>›</span>
-                )}
-              </NavLink>
-            );
-          })}
+        <div style={{
+          fontSize: "10px",
+          color: "rgba(255,255,255,0.3)",
+          textTransform: "uppercase",
+          letterSpacing: "1.2px",
+          fontWeight: "600",
+          padding: "0 14px",
+          marginBottom: "10px",
+        }}>
+          Management
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflowY: "auto" }}>
+          {managementItems.map(renderNavItem)}
         </div>
 
-        <div style={{ marginTop: "auto", paddingTop: "24px" }}>
-          <div
-            style={{
-              background: "rgba(255,111,97,0.1)",
-              borderRadius: "12px",
-              padding: "16px",
-              border: "1px solid rgba(255,111,97,0.2)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <TrendingUp size={16} color="#ff6f61" />
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", fontWeight: "500" }}>
-                Quick Stats
+        {/* Footer */}
+        <div style={{ marginTop: "auto", paddingTop: "16px" }}>
+          <div style={{
+            background: "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(255,111,97,0.1) 100%)",
+            borderRadius: "10px",
+            padding: "14px",
+            border: "1px solid rgba(255,255,255,0.05)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+              <div style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+              }}>
+                <Shield size={14} color="white" />
+              </div>
+              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "500" }}>
+                Access Level
               </span>
             </div>
-            <div style={{ fontSize: "20px", fontWeight: "700", color: "#fff" }}>
-              Admin
+            <div style={{ fontSize: "15px", fontWeight: "700", color: "#fff" }}>
+              Administrator
             </div>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
-              Full Access
+            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
+              Full System Access
             </div>
           </div>
         </div>

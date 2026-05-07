@@ -93,17 +93,15 @@ const ShopContextProvider = (props) => {
     
     const avgRating = reviewCount > 0 ? (totalRating / reviewCount) : 4.8;
     
-    // Try to get user count from backend if token available
+    // Try to get user count from backend (public endpoint, no token required)
     let userCount = 0;
-    if (token) {
-      try {
-        const userResponse = await apiService.getUserCount(token);
-        if (userResponse.success) {
-          userCount = userResponse.count || userResponse.userCount || 0;
-        }
-      } catch (error) {
-        console.log('Could not fetch user count:', error.message);
+    try {
+      const userResponse = await apiService.getUserCount();
+      if (userResponse.success) {
+        userCount = userResponse.count || userResponse.userCount || 0;
       }
+    } catch (error) {
+      console.log('Could not fetch user count:', error.message);
     }
     
     setStats({

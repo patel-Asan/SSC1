@@ -349,7 +349,7 @@ const Inventory = ({ token }) => {
                                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                         {product.image && (
                                             <img 
-                                                src={product.image} 
+                                                src={Array.isArray(product.image) ? product.image[0] : product.image} 
                                                 alt={product.name}
                                                 style={{
                                                     width: "48px",
@@ -394,6 +394,7 @@ const Inventory = ({ token }) => {
                                         <input
                                             type="number"
                                             defaultValue={product.stock}
+                                            key={`stock-input-${product._id}-${product.stock}`}
                                             min="0"
                                             style={{
                                                 width: "80px",

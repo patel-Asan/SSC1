@@ -132,13 +132,9 @@ class ApiService {
     return this.request('/stats');
   }
 
-  // Get total users count (for admin/stats)
-  async getUserCount(token) {
-    return this.request('/user/count', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+  // Get total users count (for admin/stats) - public endpoint
+  async getUserCount() {
+    return this.request('/user/count');
   }
 }
 

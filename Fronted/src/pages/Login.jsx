@@ -256,7 +256,7 @@ const Login = () => {
                       onBlur={() => setFocusedField(null)}
                       required
                       style={{
-                        width: "100%",
+                        width: "90%",
                         padding: "14px 16px",
                         fontSize: "14px",
                         border: `2px solid ${focusedField === field.id ? "#ff6f61" : "#d1d5db"}`,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./component/navbar";
 import Side from "./component/sidebar";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import ADD from "./page/Add";
 import List from "./page/list";
 import Orders from "./page/order";
@@ -15,31 +15,56 @@ import Coupons from "./page/coupons";
 import Customers from "./page/customers";
 import Newsletter from "./page/newsletter";
 import Login from "./component/login";
-import { ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
-export const currency = '$'
+export const currency = '₹'
 
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem('token')?localStorage.getItem('token'):'');
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
-  useEffect(()=>{
-    localStorage.setItem('token',token)
-  },[token])
+  useEffect(() => {
+    localStorage.setItem('token', token);
+  }, [token]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
-    <div>
-        <ToastContainer />
+    <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        theme="light"
+      />
       {token === "" ? (
         <Login setToken={setToken} />
       ) : (
-        <>
-          <Navbar setToken={setToken} setSidebarOpen={setSidebarOpen} />
-          <hr />
-          <div style={{ display: "flex", position: "relative" }}>
-            <Side sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-            <div style={{ flex: 1, padding: "20px", overflowX: "auto", transition: "margin-left 0.3s ease" }}>
+        <div style={{ display: "flex", minHeight: "100vh" }}>
+          <Side sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <div style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0
+          }}>
+            <Navbar setToken={setToken} setSidebarOpen={setSidebarOpen} />
+            <div style={{
+              flex: 1,
+              padding: "24px",
+              overflowX: "auto",
+              animation: "fadeIn 0.4s ease-out"
+            }}>
               <Routes>
                 <Route path="/" element={<Dashboard token={token} />} />
                 <Route path="/add" element={<ADD token={token} />} />
@@ -56,7 +81,7 @@ const App = () => {
               </Routes>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import apiService from "../services/api.js";
 import { Package, Upload, DollarSign, Tag, Grid, Check, Star } from "lucide-react";
 
@@ -86,23 +85,14 @@ const ADD = ({ token }) => {
   const pageContainer = {
     maxWidth: "900px",
     margin: "0 auto",
-    padding: "32px",
-  };
-
-  const headerCard = {
-    background: "linear-gradient(135deg, #fff 0%, #fff5f3 100%)",
-    borderRadius: "20px",
-    padding: "28px",
-    marginBottom: "24px",
-    border: "1px solid #ffe4e0",
-    boxShadow: "0 4px 20px rgba(255,111,97,0.08)",
+    padding: isMobile ? "16px" : "32px",
   };
 
   const formCard = {
     backgroundColor: "#fff",
-    borderRadius: "20px",
-    padding: "32px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+    borderRadius: "16px",
+    padding: isMobile ? "20px" : "32px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
     border: "1px solid #f3f4f6",
   };
 
@@ -172,17 +162,17 @@ const ADD = ({ token }) => {
   const submitBtnStyle = {
     background: loading 
       ? "linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)" 
-      : "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
+      : "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)",
     color: "#fff",
-    padding: "16px 32px",
+    padding: "14px 32px",
     border: "none",
-    borderRadius: "14px",
-    fontSize: "16px",
+    borderRadius: "12px",
+    fontSize: "15px",
     fontWeight: "700",
     cursor: loading ? "not-allowed" : "pointer",
     width: "100%",
     transition: "all 0.3s ease",
-    boxShadow: loading ? "none" : "0 4px 20px rgba(255,111,97,0.3)",
+    boxShadow: loading ? "none" : "0 4px 20px rgba(139,92,246,0.3)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -205,27 +195,17 @@ const ADD = ({ token }) => {
   return (
     <div style={pageContainer}>
       {/* Header */}
-      <div style={headerCard}>
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "12px" : "16px", flexWrap: "wrap" }}>
-          <div style={{
-            width: isMobile ? "44px" : "56px",
-            height: isMobile ? "44px" : "56px",
-            borderRadius: "16px",
-            background: "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-            <Package size={isMobile ? 22 : 28} color="#fff" />
-          </div>
-          <div>
-            <h1 style={{ margin: "0 0 4px 0", fontSize: isMobile ? "1.25rem" : "26px", fontWeight: "800", color: "#1f2937" }}>
-              Add New Product
-            </h1>
-            <p style={{ margin: 0, fontSize: isMobile ? "12px" : "14px", color: "#6b7280" }}>
-              Create a new product to add to your store inventory
-            </p>
-          </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
+        <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Package size={22} color="white" />
+        </div>
+        <div>
+          <h1 style={{ fontSize: "22px", fontWeight: "800", color: "#111827", margin: "0 0 2px 0" }}>
+            Add New Product
+          </h1>
+          <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+            Create a new product to add to your store inventory
+          </p>
         </div>
       </div>
 
@@ -425,18 +405,7 @@ const ADD = ({ token }) => {
         }
       `}</style>
 
-      <ToastContainer 
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
+
     </div>
   );
 };
