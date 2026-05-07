@@ -61,7 +61,6 @@ const App = () => {
             <Navbar setToken={setToken} setSidebarOpen={setSidebarOpen} />
             <div style={{
               flex: 1,
-              padding: "24px",
               overflowX: "auto",
               animation: "fadeIn 0.4s ease-out"
             }}>

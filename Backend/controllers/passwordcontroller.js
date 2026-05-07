@@ -1,6 +1,7 @@
 import userModel from "../models/usermodel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { sendPasswordResetEmail } from "./emailcontroller.js";
 
 const forgotPassword = async (req, res) => {
     try {
@@ -12,7 +13,7 @@ const forgotPassword = async (req, res) => {
 
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(200).json({ success: true, message: "If email exists, reset token has been sent" });
+            return res.status(200).json({ success: true, message: "If email exists, reset link has been sent" });
         }
 
         const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
@@ -21,10 +22,16 @@ const forgotPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
         await user.save();
 
+        // Send password reset email
+        try {
+            await sendPasswordResetEmail(user.email, resetToken);
+        } catch (emailErr) {
+            console.error("Failed to send password reset email:", emailErr);
+        }
+
         res.status(200).json({ 
             success: true, 
-            message: "Password reset token generated",
-            resetToken 
+            message: "Password reset link has been sent to your email"
         });
     } catch (error) {
         console.error("Forgot password error:", error);

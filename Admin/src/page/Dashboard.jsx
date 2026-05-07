@@ -96,7 +96,7 @@ const Dashboard = ({ token }) => {
   ];
 
   return (
-    <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: isMobile ? "16px" : "24px" }}>
       {/* Header */}
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: isMobile ? "stretch" : "center",

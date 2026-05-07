@@ -7,6 +7,8 @@ import About from "./pages/About";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Placeorder from "./pages/Placeorder";
 import Order from "./pages/order";
 import Profile from "./pages/Profile";
@@ -61,6 +63,8 @@ const AppContent = () => {
             <Route path="/product/:productId" element={<PageTransition><Product /></PageTransition>} />
             <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
             <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+            <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+            <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
             <Route path="/placeorder" element={<PageTransition><Placeorder /></PageTransition>} />
             <Route path="/order" element={<PageTransition><Order /></PageTransition>} />
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />

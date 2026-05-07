@@ -2,6 +2,7 @@ import orderModel from "../models/orderModel.js"
 import userModel from "../models/usermodel.js"
 import { notifyNewOrder, notifyOrderCancelled, notifyOrderDelivered } from "./notificationcontroller.js"
 import { incrementCouponUsage } from "./couponcontroller.js"
+import { sendOrderConfirmationEmail, sendOrderStatusEmail } from "./emailcontroller.js"
 
 
 // Placing orders using COD Method
@@ -43,6 +44,22 @@ const placeOrder = async (req,res) => {
             userId: userId,
             amount: amount
         });
+
+        // Send order confirmation email
+        try {
+            const user = await userModel.findById(userId);
+            if (user?.email) {
+                await sendOrderConfirmationEmail(user.email, {
+                    orderId: newOrder._id,
+                    amount: amount,
+                    items: items,
+                    paymentMethod: 'COD',
+                    status: 'Processing'
+                });
+            }
+        } catch (emailErr) {
+            console.error("Failed to send order confirmation email:", emailErr);
+        }
 
         await userModel.findByIdAndUpdate(userId,{cartData:{}})
 
@@ -115,6 +132,20 @@ const updateStatus = async (req,res) => {
                 success: false,
                 message: "Order not found"
             });
+        }
+
+        // Send order status email
+        try {
+            const user = await userModel.findById(updatedOrder.userId);
+            if (user?.email) {
+                await sendOrderStatusEmail(user.email, {
+                    orderId: updatedOrder._id,
+                    status: status,
+                    amount: updatedOrder.amount
+                });
+            }
+        } catch (emailErr) {
+            console.error("Failed to send order status email:", emailErr);
         }
 
         if (status === 'Cancelled') {

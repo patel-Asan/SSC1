@@ -302,6 +302,7 @@ const Login = () => {
                     Remember me
                   </label>
                   <motion.span
+                    onClick={() => navigate("/forgot-password")}
                     whileHover={{ color: "#ff6f61" }}
                     style={{ cursor: "pointer", fontWeight: "500" }}
                   >

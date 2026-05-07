@@ -5,6 +5,7 @@ import userModel from "../models/usermodel.js";
 import orderModel from "../models/orderModel.js";
 import reviewModel from "../models/reviewModel.js";
 import { notifyNewUser } from "./notificationcontroller.js";
+import { sendWelcomeEmail } from "./emailcontroller.js";
 
 // Token creation function
 const createToken = (id) => {
@@ -209,6 +210,13 @@ const registerUser = async (req, res) => {
             name: user.name,
             email: user.email
         });
+
+        // Send welcome email
+        try {
+            await sendWelcomeEmail(user.email, user.name);
+        } catch (emailErr) {
+            console.error("Failed to send welcome email:", emailErr);
+        }
         
         const token = createToken(user._id);
 

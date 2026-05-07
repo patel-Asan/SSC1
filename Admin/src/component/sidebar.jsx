@@ -209,40 +209,7 @@ const Side = ({ sidebarOpen, setSidebarOpen }) => {
         <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflowY: "auto" }}>
           {managementItems.map(renderNavItem)}
         </div>
-
-        {/* Footer */}
-        <div style={{ marginTop: "auto", paddingTop: "16px" }}>
-          <div style={{
-            background: "linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(255,111,97,0.1) 100%)",
-            borderRadius: "10px",
-            padding: "14px",
-            border: "1px solid rgba(255,255,255,0.05)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <div style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-              }}>
-                <Shield size={14} color="white" />
-              </div>
-              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", fontWeight: "500" }}>
-                Access Level
-              </span>
-            </div>
-            <div style={{ fontSize: "15px", fontWeight: "700", color: "#fff" }}>
-              Administrator
-            </div>
-            <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
-              Full System Access
-            </div>
-          </div>
-        </div>
+        
       </div>
     </>
   );
