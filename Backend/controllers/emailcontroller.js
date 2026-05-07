@@ -1,32 +1,43 @@
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 
-// Email transporter setup
-const createTransporter = () => {
-    return nodemailer.createTransport({
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
+const fromEmail = process.env.FROM_EMAIL || process.env.EMAIL_USER || 'noreply@sscstore.com';
+
+const sendEmail = async (to, subject, html) => {
+    if (process.env.SENDGRID_API_KEY) {
+        await sgMail.send({ to, from: fromEmail, subject, html });
+        return;
+    }
+    const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
-        }
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
     });
+    await transporter.sendMail({ from: fromEmail, to, subject, html });
 };
 
-// Send order status email
+const buildOrderId = (id) => String(id).slice(-8);
+
 const sendOrderStatusEmail = async (email, orderData) => {
     try {
-        const transporter = createTransporter();
-        
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: `Order Status Update - Order #${orderData.orderId?.slice(-8)}`,
-            html: `
+        const orderId = buildOrderId(orderData.orderId);
+        await sendEmail(email,
+            `Order Status Update - Order #${orderId}`,
+            `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #8b5cf6;">Order Status Updated</h2>
                     <p>Dear Customer,</p>
                     <p>Your order status has been updated to: <strong>${orderData.status}</strong></p>
                     <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <p><strong>Order ID:</strong> #${orderData.orderId?.slice(-8)}</p>
+                        <p><strong>Order ID:</strong> #${orderId}</p>
                         <p><strong>Amount:</strong> ₹${orderData.amount}</p>
                         <p><strong>Status:</strong> ${orderData.status}</p>
                     </div>
@@ -34,10 +45,8 @@ const sendOrderStatusEmail = async (email, orderData) => {
                     <p style="color: #6b7280; font-size: 12px;">This is an automated email. Please do not reply.</p>
                 </div>
             `
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent to ${email} for order #${orderData.orderId?.slice(-8)}`);
+        );
+        console.log(`✅ Email sent to ${email} for order #${orderId}`);
         return true;
     } catch (error) {
         console.error("❌ Email send error:", error);
@@ -45,16 +54,11 @@ const sendOrderStatusEmail = async (email, orderData) => {
     }
 };
 
-// Send welcome email
 const sendWelcomeEmail = async (email, name) => {
     try {
-        const transporter = createTransporter();
-        
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Welcome to Our Store!',
-            html: `
+        await sendEmail(email,
+            'Welcome to Our Store!',
+            `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #8b5cf6;">Welcome to Our Store!</h2>
                     <p>Dear ${name},</p>
@@ -67,9 +71,7 @@ const sendWelcomeEmail = async (email, name) => {
                     <p style="color: #6b7280; font-size: 12px;">This is an automated email. Please do not reply.</p>
                 </div>
             `
-        };
-
-        await transporter.sendMail(mailOptions);
+        );
         console.log(`✅ Welcome email sent to ${email}`);
         return true;
     } catch (error) {
@@ -78,16 +80,11 @@ const sendWelcomeEmail = async (email, name) => {
     }
 };
 
-// Send promotional email
 const sendPromotionalEmail = async (email, subject, message) => {
     try {
-        const transporter = createTransporter();
-        
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: subject,
-            html: `
+        await sendEmail(email,
+            subject,
+            `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h2 style="margin: 0;">Special Offer!</h2>
@@ -99,9 +96,7 @@ const sendPromotionalEmail = async (email, subject, message) => {
                     <p style="color: #6b7280; font-size: 12px;">This is an automated email. Please do not reply.</p>
                 </div>
             `
-        };
-
-        await transporter.sendMail(mailOptions);
+        );
         console.log(`✅ Promotional email sent to ${email}`);
         return true;
     } catch (error) {
@@ -110,20 +105,16 @@ const sendPromotionalEmail = async (email, subject, message) => {
     }
 };
 
-// Send order confirmation email (when order is placed)
 const sendOrderConfirmationEmail = async (email, orderData) => {
     try {
-        const transporter = createTransporter();
-
+        const orderId = buildOrderId(orderData.orderId);
         const itemsList = orderData.items?.map(item =>
             `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb">${item.name}</td><td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center">x${item.quantity || 1}</td><td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right">₹${item.price}</td></tr>`
         ).join('') || '';
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: `Order Confirmed - Order #${orderData.orderId?.slice(-8)}`,
-            html: `
+        await sendEmail(email,
+            `Order Confirmed - Order #${orderId}`,
+            `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
                         <h1 style="margin: 0; font-size: 24px;">🎉 Order Confirmed!</h1>
@@ -133,7 +124,7 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
                         <p>Dear Customer,</p>
                         <p>Your order has been placed successfully.</p>
                         <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <p style="margin: 0 0 4px 0;"><strong>Order ID:</strong> #${orderData.orderId?.slice(-8)}</p>
+                            <p style="margin: 0 0 4px 0;"><strong>Order ID:</strong> #${orderId}</p>
                             <p style="margin: 0 0 4px 0;"><strong>Total Amount:</strong> ₹${orderData.amount}</p>
                             <p style="margin: 0 0 4px 0;"><strong>Payment Method:</strong> ${orderData.paymentMethod || 'COD'}</p>
                             <p style="margin: 0;"><strong>Status:</strong> ${orderData.status || 'Processing'}</p>
@@ -147,10 +138,8 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
                     </div>
                 </div>
             `
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Order confirmation sent to ${email} for order #${orderData.orderId?.slice(-8)}`);
+        );
+        console.log(`✅ Order confirmation sent to ${email} for order #${orderId}`);
         return true;
     } catch (error) {
         console.error("❌ Order confirmation email error:", error);
@@ -158,18 +147,14 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
     }
 };
 
-// Send password reset email
 const sendPasswordResetEmail = async (email, resetToken) => {
     try {
-        const transporter = createTransporter();
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Password Reset - Your Store',
-            html: `
+        await sendEmail(email,
+            'Password Reset - Your Store',
+            `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
                         <h1 style="margin: 0; font-size: 24px;">🔒 Password Reset</h1>
@@ -187,9 +172,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
                     </div>
                 </div>
             `
-        };
-
-        await transporter.sendMail(mailOptions);
+        );
         console.log(`✅ Password reset email sent to ${email}`);
         return true;
     } catch (error) {
@@ -199,6 +182,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 };
 
 export {
+    sendEmail,
     sendOrderStatusEmail,
     sendWelcomeEmail,
     sendPromotionalEmail,

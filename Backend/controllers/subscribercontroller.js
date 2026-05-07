@@ -1,17 +1,7 @@
 import subscriberModel from "../models/subscribermodel.js";
 import couponModel from "../models/couponmodel.js";
 import userModel from "../models/usermodel.js";
-import nodemailer from 'nodemailer';
-
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
-};
+import { sendEmail } from "./emailcontroller.js";
 
 const subscribeNewsletter = async (req, res) => {
     try {
@@ -60,12 +50,9 @@ const subscribeNewsletter = async (req, res) => {
         await subscriber.save();
 
         try {
-            const transporter = createTransporter();
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: user.email,
-                subject: `Welcome! Your 10% Off Coupon: ${couponCode}`,
-                html: `
+            await sendEmail(user.email,
+                `Welcome! Your 10% Off Coupon: ${couponCode}`,
+                `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                         <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
                             <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Welcome!</h1>
@@ -83,7 +70,7 @@ const subscribeNewsletter = async (req, res) => {
                         </div>
                     </div>
                 `
-            });
+            );
         } catch (emailError) {
             console.error("Welcome email failed:", emailError);
         }
@@ -167,12 +154,9 @@ const sendBulkNewsletter = async (req, res) => {
 
         for (const subscriber of activeSubscribers) {
             try {
-                const transporter = createTransporter();
-                await transporter.sendMail({
-                    from: process.env.EMAIL_USER,
-                    to: subscriber.email,
+                await sendEmail(subscriber.email,
                     subject,
-                    html: `
+                    `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                             <div style="padding: 30px;">
                                 <h2 style="color: #1f2937;">Hi ${subscriber.name},</h2>
@@ -186,7 +170,7 @@ const sendBulkNewsletter = async (req, res) => {
                             </div>
                         </div>
                     `
-                });
+                );
                 sent++;
             } catch (err) {
                 failed++;
