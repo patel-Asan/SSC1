@@ -40,7 +40,7 @@ const Login = ({ setToken }) => {
       background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
       position: "relative",
       overflow: "hidden",
-      padding: "20px"
+      padding: "clamp(16px, 4vw, 32px)"
     }}>
       {/* Animated background elements */}
       <div style={{
@@ -66,7 +66,7 @@ const Login = ({ setToken }) => {
 
       <div style={{
         width: "100%",
-        maxWidth: "420px",
+        maxWidth: "400px",
         position: "relative",
         zIndex: 1,
         animation: "slideUp 0.6s ease-out"
@@ -74,35 +74,36 @@ const Login = ({ setToken }) => {
         {/* Logo Section */}
         <div style={{
           textAlign: "center",
-          marginBottom: "32px"
+          marginBottom: "24px"
         }}>
           <div style={{
-            width: "72px",
-            height: "72px",
-            borderRadius: "20px",
+            width: "64px",
+            height: "64px",
+            borderRadius: "16px",
             background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            margin: "0 auto 16px",
-            boxShadow: "0 8px 32px rgba(139,92,246,0.3)"
+            margin: "0 auto 12px",
+            boxShadow: "0 4px 20px rgba(139,92,246,0.25)"
           }}>
-            <Shield size={36} color="white" />
+            <Shield size={32} color="white" />
           </div>
           <h1 style={{
-            fontSize: "28px",
-            fontWeight: "800",
+            fontSize: "clamp(24px, 5vw, 28px)",
+            fontWeight: "700",
             color: "#fff",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.5px"
+            margin: "0 0 6px 0",
+            letterSpacing: "-0.3px"
           }}>
             SSC Admin
           </h1>
           <p style={{
-            fontSize: "14px",
-            color: "rgba(255,255,255,0.6)",
+            fontSize: "clamp(13px, 3vw, 14px)",
+            color: "rgba(255,255,255,0.5)",
             margin: 0,
-            fontWeight: "400"
+            fontWeight: "400",
+            letterSpacing: "0.2px"
           }}>
             Sign in to your admin dashboard
           </p>
@@ -110,34 +111,35 @@ const Login = ({ setToken }) => {
 
         {/* Login Card */}
         <div style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "24px",
-          padding: "36px",
-          boxShadow: "0 25px 60px rgba(0,0,0,0.3)"
+          background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+          backdropFilter: "blur(24px) saturate(180%)",
+          WebkitBackdropFilter: "blur(24px) saturate(180%)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: "20px",
+          padding: "clamp(24px, 5vw, 32px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.1)"
         }}>
-          <form onSubmit={submitHandler} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form onSubmit={submitHandler} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div>
               <label style={{
                 display: "block",
-                fontSize: "13px",
-                fontWeight: "600",
-                color: "rgba(255,255,255,0.8)",
-                marginBottom: "8px"
+                fontSize: "12px",
+                fontWeight: "500",
+                color: "rgba(255,255,255,0.7)",
+                marginBottom: "6px",
+                letterSpacing: "0.3px"
               }}>
                 Email Address
               </label>
               <div style={{
                 position: "relative"
               }}>
-                <Mail size={18} style={{
+                <Mail size={16} style={{
                   position: "absolute",
-                  left: "14px",
+                  left: "12px",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "black",
                   pointerEvents: "none"
                 }} />
                 <input
@@ -147,15 +149,15 @@ const Login = ({ setToken }) => {
                   placeholder="admin@example.com"
                   required
                   style={{
-                    width: "100%",
-                    padding: "14px 14px 14px 44px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
+                    width: "84%",
+                    padding: "10px 12px 10px 40px",
+                    // background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "10px",
                     fontSize: "14px",
                     color: "#fff",
                     outline: "none",
-                    transition: "all 0.3s ease"
+                    transition: "all 0.2s ease"
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = "rgba(139,92,246,0.5)";
@@ -174,20 +176,21 @@ const Login = ({ setToken }) => {
             <div>
               <label style={{
                 display: "block",
-                fontSize: "13px",
-                fontWeight: "600",
-                color: "rgba(255,255,255,0.8)",
-                marginBottom: "8px"
+                fontSize: "12px",
+                fontWeight: "500",
+                color: "rgba(255,255,255,0.7)",
+                marginBottom: "6px",
+                letterSpacing: "0.3px"
               }}>
                 Password
               </label>
               <div style={{ position: "relative" }}>
-                <Lock size={18} style={{
+                <Lock size={16} style={{
                   position: "absolute",
-                  left: "14px",
+                  left: "12px",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "black",
                   pointerEvents: "none"
                 }} />
                 <input
@@ -197,24 +200,24 @@ const Login = ({ setToken }) => {
                   placeholder="Enter your password"
                   required
                   style={{
-                    width: "100%",
-                    padding: "14px 44px 14px 44px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
+                    width: "75%",
+                    padding: "10px 40px 10px 40px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "10px",
                     fontSize: "14px",
                     color: "#fff",
                     outline: "none",
-                    transition: "all 0.3s ease"
+                    transition: "all 0.2s ease"
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "rgba(139,92,246,0.5)";
-                    e.target.style.background = "rgba(255,255,255,0.1)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.15)";
+                    e.target.style.borderColor = "rgba(139,92,246,0.4)";
+                    e.target.style.background = "rgba(255,255,255,0.12)";
+                    e.target.style.boxShadow = "0 0 0 2px rgba(139,92,246,0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(255,255,255,0.1)";
-                    e.target.style.background = "rgba(255,255,255,0.06)";
+                    e.target.style.borderColor = "rgba(255,255,255,0.12)";
+                    e.target.style.background = "rgba(255,255,255,0.08)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
@@ -223,18 +226,18 @@ const Login = ({ setToken }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: "absolute",
-                    right: "14px",
+                    right: "12px",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: "rgba(255,255,255,0.4)",
-                    padding: "4px",
+                    color: "black",
+                    padding: "2px",
                     display: "flex"
                   }}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
@@ -244,30 +247,30 @@ const Login = ({ setToken }) => {
               disabled={loading}
               style={{
                 width: "100%",
-                padding: "14px",
+                padding: "12px",
                 background: loading
                   ? "linear-gradient(135deg, #6d28d9 0%, #dc2626 100%)"
                   : "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
                 border: "none",
-                borderRadius: "12px",
-                fontSize: "15px",
-                fontWeight: "700",
+                borderRadius: "10px",
+                fontSize: "14px",
+                fontWeight: "600",
                 color: "white",
                 cursor: loading ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "10px",
+                gap: "8px",
                 opacity: loading ? 0.7 : 1,
-                transition: "all 0.3s ease",
+                transition: "all 0.2s ease",
                 marginTop: "4px",
                 position: "relative",
                 overflow: "hidden"
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
-                  e.target.style.transform = "translateY(-2px)";
-                  e.target.style.boxShadow = "0 8px 25px rgba(139,92,246,0.4)";
+                  e.target.style.transform = "translateY(-1px)";
+                  e.target.style.boxShadow = "0 4px 12px rgba(139,92,246,0.3)";
                 }
               }}
               onMouseLeave={(e) => {
@@ -289,7 +292,7 @@ const Login = ({ setToken }) => {
                 </>
               ) : (
                 <>
-                  <LogIn size={20} />
+                  <LogIn size={18} />
                   Sign In
                 </>
               )}
@@ -298,19 +301,19 @@ const Login = ({ setToken }) => {
 
           {/* Credentials Hint */}
           <div style={{
-            marginTop: "24px",
-            padding: "16px",
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: "12px",
-            border: "1px solid rgba(255,255,255,0.06)"
+            marginTop: "20px",
+            padding: "12px",
+            background: "rgba(255,255,255,0.06)",
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)"
           }}>
             <p style={{
-              margin: "0 0 8px 0",
-              fontSize: "11px",
-              color: "rgba(255,255,255,0.4)",
-              fontWeight: "600",
+              margin: "0 0 6px 0",
+              fontSize: "10px",
+              color: "rgba(255,255,255,0.35)",
+              fontWeight: "500",
               textTransform: "uppercase",
-              letterSpacing: "1px",
+              letterSpacing: "0.8px",
               textAlign: "center"
             }}>
               Demo Credentials
@@ -318,9 +321,9 @@ const Login = ({ setToken }) => {
             <div style={{
               display: "flex",
               flexDirection: "column",
-              gap: "4px",
-              fontSize: "13px",
-              color: "rgba(255,255,255,0.6)",
+              gap: "3px",
+              fontSize: "12px",
+              color: "rgba(255,255,255,0.5)",
               textAlign: "center"
             }}>
               <span>Email: <strong style={{ color: "rgba(255,255,255,0.8)" }}>adminssc@gmail.com</strong></span>
@@ -332,9 +335,10 @@ const Login = ({ setToken }) => {
         {/* Footer */}
         <p style={{
           textAlign: "center",
-          marginTop: "24px",
-          fontSize: "12px",
-          color: "rgba(255,255,255,0.3)"
+          marginTop: "20px",
+          fontSize: "11px",
+          color: "rgba(255,255,255,0.25)",
+          letterSpacing: "0.2px"
         }}>
           &copy; 2026 SSC Admin Panel. All rights reserved.
         </p>

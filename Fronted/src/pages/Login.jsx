@@ -3,6 +3,7 @@ import { Shopcontext } from "../context/shopcontext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaGoogle, FaFacebookF, FaApple, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaShoppingBag, FaTruck, FaUndo, FaHeadset } from "react-icons/fa";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
@@ -65,9 +66,9 @@ const Login = () => {
   };
 
   const inputFields = [
-    { id: "name", type: "text", placeholder: "Full Name", value: name, setter: setName, show: currentState === "Sign Up" },
-    { id: "email", type: "email", placeholder: "Email Address", value: email, setter: setEmail },
-    { id: "password", type: showPassword ? "text" : "password", placeholder: "Password", value: password, setter: setPassword, isPassword: true },
+    { id: "name", type: "text", placeholder: "Full Name", value: name, setter: setName, show: currentState === "Sign Up", icon: <FaUser /> },
+    { id: "email", type: "email", placeholder: "Email Address", value: email, setter: setEmail, icon: <FaEnvelope /> },
+    { id: "password", type: showPassword ? "text" : "password", placeholder: "Password", value: password, setter: setPassword, isPassword: true, icon: <FaLock /> },
   ];
 
   return (
@@ -131,15 +132,22 @@ const Login = () => {
             gap: "16px",
           }}
         >
-          {["✓ Free Shipping on Orders $50+", "✓ 30-Day Easy Returns", "✓ 24/7 Customer Support"].map((feature, index) => (
+          {[
+            { text: "Free Shipping on Orders $50+", icon: <FaTruck /> },
+            { text: "30-Day Easy Returns", icon: <FaUndo /> },
+            { text: "24/7 Customer Support", icon: <FaHeadset /> },
+          ].map((feature, index) => (
             <motion.div
               key={index}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4 + index * 0.1 }}
-              style={{ fontSize: "16px", opacity: 0.9 }}
+              style={{ fontSize: "16px", opacity: 0.9, display: "flex", alignItems: "center", gap: "12px" }}
             >
-              {feature}
+              <span style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", flexShrink: 0 }}>
+                {feature.icon}
+              </span>
+              {feature.text}
             </motion.div>
           ))}
         </motion.div>
@@ -246,9 +254,22 @@ const Login = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    style={{ position: "relative", width: "100%" }}
+                    style={{ position: "relative", width: "100%", display: "flex", justifyContent: "center" }}
                   >
                     <div style={{ position: "relative", width: "100%" }}>
+                      <span style={{
+                        position: "absolute",
+                        left: "14px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: focusedField === field.id ? "#ff6f61" : "#9ca3af",
+                        fontSize: "14px",
+                        zIndex: 1,
+                        transition: "color 0.3s ease",
+                        pointerEvents: "none",
+                      }}>
+                        {field.icon}
+                      </span>
                       <motion.input
                         type={field.type}
                         placeholder={field.placeholder}
@@ -258,9 +279,11 @@ const Login = () => {
                         onBlur={() => setFocusedField(null)}
                         required
                         style={{
-                          width: field.isPassword ? "80%" : "90%",
+                          width: "100%",
                           padding: "14px 16px",
+                          paddingLeft: "42px",
                           paddingRight: field.isPassword ? "48px" : "16px",
+                          boxSizing: "border-box",
                           fontSize: "14px",
                           border: `2px solid ${focusedField === field.id ? "#ff6f61" : "#d1d5db"}`,
                           borderRadius: "12px",
@@ -287,13 +310,14 @@ const Login = () => {
                             top: "50%",
                             transform: "translateY(-50%)",
                             cursor: "pointer",
-                            fontSize: "18px",
+                            fontSize: "16px",
                             color: "#9ca3af",
                             userSelect: "none",
                             lineHeight: 1,
+                            transition: "color 0.3s ease",
                           }}
                         >
-                          {showPassword ? "🙈" : "👁️"}
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                       )}
                     </div>
@@ -349,6 +373,7 @@ const Login = () => {
                   cursor: isLoading ? "default" : "pointer",
                   transition: "all 0.3s ease",
                   boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
+                  boxSizing: "border-box",
                 }}
                 whileHover={!isLoading ? { 
                   backgroundColor: "#ff5545",
@@ -357,16 +382,7 @@ const Login = () => {
                 } : {}}
                 whileTap={!isLoading ? { scale: 0.98 } : {}}
               >
-                {isLoading ? (
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    Processing...
-                  </motion.span>
-                ) : (
-                  currentState === "Login" ? "Sign In" : "Create Account"
-                )}
+                {isLoading ? "Processing..." : currentState === "Login" ? "Sign In" : "Create Account"}
               </motion.button>
             </motion.form>
           </AnimatePresence>
@@ -395,9 +411,9 @@ const Login = () => {
             style={{ display: "flex", gap: "12px" }}
           >
             {[
-              { name: "Google", icon: "G" },
-              { name: "Facebook", icon: "f" },
-              { name: "Apple", icon: "🍎" }
+              { name: "Google", icon: <FaGoogle /> },
+              { name: "Facebook", icon: <FaFacebookF /> },
+              { name: "Apple", icon: <FaApple /> }
             ].map((provider, index) => (
               <motion.button
                 key={provider.name}
@@ -412,8 +428,7 @@ const Login = () => {
                   backgroundColor: "#fff",
                   border: "2px solid #e5e7eb",
                   borderRadius: "12px",
-                  fontSize: "14px",
-                  fontWeight: "600",
+                  fontSize: "18px",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
