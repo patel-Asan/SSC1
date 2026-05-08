@@ -31,6 +31,8 @@ const Placeorder = () => {
   } = useContext(Shopcontext);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -43,6 +45,62 @@ const Placeorder = () => {
     country: "",
     phone: "",
   });
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await axios.get(`${backendUrl}/api/user/profile`, { headers: { token } });
+      if (res.data.success) {
+        setSavedAddresses(res.data.user.addresses || []);
+        const user = res.data.user;
+        if (user.addresses?.length > 0) {
+          const defaultAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
+          selectAddress(defaultAddr);
+        } else if (user.address?.street) {
+          setFormData({
+            firstName: user.name?.split(" ")[0] || "",
+            lastName: user.name?.split(" ").slice(1).join(" ") || "",
+            email: user.email || "",
+            street: user.address.street || "",
+            city: user.address.city || "",
+            state: user.address.state || "",
+            zipcode: user.address.zipcode || "",
+            country: user.address.country || "",
+            phone: user.phone || "",
+          });
+        }
+      }
+    } catch (err) {
+      console.log("Failed to load addresses:", err);
+    }
+  };
+
+  const selectAddress = (addr) => {
+    setSelectedAddressId(addr._id || "new");
+    setFormData({
+      firstName: formData.firstName || "",
+      lastName: formData.lastName || "",
+      email: formData.email || "",
+      street: addr.street || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      zipcode: addr.zipcode || "",
+      country: addr.country || "India",
+      phone: addr.phone || "",
+    });
+  };
+
+  const useNewAddress = () => {
+    setSelectedAddressId("new");
+    setFormData({
+      firstName: "", lastName: "", email: "",
+      street: "", city: "", state: "",
+      zipcode: "", country: "India", phone: "",
+    });
+  };
+
+  useEffect(() => {
+    if (token) fetchAddresses();
+  }, [token]);
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -196,9 +254,78 @@ const Placeorder = () => {
         style={{ flex: 1, maxWidth: isMobile ? "100%" : "600px" }}
       >
         <Title text1={"DELIVERY_"} text2={"INFORMATION"} />
-        
+
+        {/* SAVED ADDRESSES */}
+        {savedAddresses.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginTop: "24px", marginBottom: "8px" }}
+          >
+            <p style={{ fontSize: "13px", fontWeight: "600", color: "#6b7280", margin: "0 0 10px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Saved Addresses
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {savedAddresses.map((addr) => (
+                <motion.div
+                  key={addr._id}
+                  onClick={() => selectAddress(addr)}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  style={{
+                    padding: "14px 18px",
+                    borderRadius: "12px",
+                    border: `2px solid ${selectedAddressId === addr._id ? "#ff6f61" : "#e5e7eb"}`,
+                    background: selectedAddressId === addr._id ? "rgba(255,111,97,0.04)" : "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    boxShadow: selectedAddressId === addr._id ? "0 2px 8px rgba(255,111,97,0.1)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontWeight: "700", fontSize: "14px", color: "#1f2937" }}>
+                        {addr.label || "Address"}
+                      </span>
+                      {addr.isDefault && (
+                        <span style={{ marginLeft: "8px", fontSize: "11px", background: "#ff6f61", color: "#fff", padding: "2px 8px", borderRadius: "4px", fontWeight: "600" }}>
+                          Default
+                        </span>
+                      )}
+                      <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#6b7280", lineHeight: "1.4" }}>
+                        {addr.street}, {addr.city}, {addr.state} - {addr.zipcode}
+                      </p>
+                    </div>
+                    {selectedAddressId === addr._id && (
+                      <span style={{ color: "#ff6f61", fontSize: "18px" }}>✓</span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+              <motion.div
+                onClick={useNewAddress}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                style={{
+                  padding: "14px 18px",
+                  borderRadius: "12px",
+                  border: `2px dashed ${selectedAddressId === "new" ? "#ff6f61" : "#d1d5db"}`,
+                  background: selectedAddressId === "new" ? "rgba(255,111,97,0.04)" : "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "center",
+                }}
+              >
+                <span style={{ fontSize: "13px", fontWeight: "600", color: selectedAddressId === "new" ? "#ff6f61" : "#6b7280" }}>
+                  + Add New Address
+                </span>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
-          style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "24px" }}
+          style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}
         >
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             <motion.input

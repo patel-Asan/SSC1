@@ -32,7 +32,8 @@ const getUserProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
-                address: user.address
+                address: user.address,
+                addresses: user.addresses || []
             }
         });
     } catch (error) {
