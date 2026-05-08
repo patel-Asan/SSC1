@@ -316,7 +316,9 @@ const Placeorder = () => {
                   textAlign: "center",
                 }}
               >
-                
+                <span style={{ fontSize: "13px", fontWeight: "600", color: selectedAddressId === "new" ? "#ff6f61" : "#6b7280" }}>
+                  + Add New Address
+                </span>
               </motion.div>
             </div>
           </motion.div>
