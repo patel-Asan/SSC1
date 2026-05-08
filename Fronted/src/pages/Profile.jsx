@@ -698,8 +698,12 @@ const Profile = () => {
                       exit={{ opacity: 0 }}
                       style={{
                         position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        zIndex: 1000, padding: isMobile ? "12px" : "20px",
+                        display: "flex",
+                        alignItems: isMobile ? "flex-start" : "center",
+                        justifyContent: "center",
+                        zIndex: 1000,
+                        padding: isMobile ? "12px" : "20px",
+                        paddingTop: isMobile ? "140px" : "20px",
                         backdropFilter: "blur(4px)",
                       }}
                       onClick={() => setShowAddressModal(false)}
