@@ -11,6 +11,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Placeorder from "./pages/Placeorder";
 import Order from "./pages/order";
+import OrderSuccess from "./pages/OrderSuccess";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import Nav from "./componet/nav";
@@ -66,6 +67,7 @@ const AppContent = () => {
             <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
             <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
             <Route path="/placeorder" element={<PageTransition><Placeorder /></PageTransition>} />
+            <Route path="/order-success" element={<PageTransition><OrderSuccess /></PageTransition>} />
             <Route path="/order" element={<PageTransition><Order /></PageTransition>} />
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
             <Route path="/wishlist" element={<PageTransition><Wishlist /></PageTransition>} />

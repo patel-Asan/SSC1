@@ -34,6 +34,7 @@ const Placeorder = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
+  const [userProfile, setUserProfile] = useState({ firstName: "", lastName: "", email: "" });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -52,14 +53,21 @@ const Placeorder = () => {
       if (res.data.success) {
         setSavedAddresses(res.data.user.addresses || []);
         const user = res.data.user;
+        const nameParts = user.name?.split(" ") || [];
+        const profile = {
+          firstName: nameParts[0] || "",
+          lastName: nameParts.slice(1).join(" ") || "",
+          email: user.email || "",
+        };
+        setUserProfile(profile);
         if (user.addresses?.length > 0) {
           const defaultAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
-          selectAddress(defaultAddr);
+          selectAddress(defaultAddr, profile);
         } else if (user.address?.street) {
           setFormData({
-            firstName: user.name?.split(" ")[0] || "",
-            lastName: user.name?.split(" ").slice(1).join(" ") || "",
-            email: user.email || "",
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            email: profile.email,
             street: user.address.street || "",
             city: user.address.city || "",
             state: user.address.state || "",
@@ -67,6 +75,13 @@ const Placeorder = () => {
             country: user.address.country || "",
             phone: user.phone || "",
           });
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            email: profile.email,
+          }));
         }
       }
     } catch (err) {
@@ -74,12 +89,13 @@ const Placeorder = () => {
     }
   };
 
-  const selectAddress = (addr) => {
+  const selectAddress = (addr, profile) => {
+    const p = profile || userProfile;
     setSelectedAddressId(addr._id || "new");
     setFormData({
-      firstName: formData.firstName || "",
-      lastName: formData.lastName || "",
-      email: formData.email || "",
+      firstName: p.firstName,
+      lastName: p.lastName,
+      email: p.email,
       street: addr.street || "",
       city: addr.city || "",
       state: addr.state || "",
@@ -185,7 +201,7 @@ const Placeorder = () => {
           if (response.data.success) {
             setCartItems({});
             toast.success("Order placed successfully!");
-            navigate("/order");
+            navigate("/order-success");
           } else {
             toast.error(response.data.message || "Failed to place order");
           }
