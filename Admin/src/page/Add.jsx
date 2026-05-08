@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { toast } from "react-toastify";
 import apiService from "../services/api.js";
@@ -14,13 +14,29 @@ const ADD = ({ token }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("Men");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
   const [subcategory, setSubcategory] = useState("Topwear");
   const [bestseller, setBestseller] = useState(false);
   const [Sizes, setSizes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
   const [stock, setStock] = useState("");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await apiService.request("/category/active");
+        if (res.categories?.length > 0) {
+          setCategories(res.categories);
+          setCategory(res.categories[0].name);
+        }
+      } catch (err) {
+        console.log("Failed to load categories");
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const toggleSize = (size) => {
     setSizes((prev) =>
@@ -40,7 +56,7 @@ const ADD = ({ token }) => {
     setLoading(true);
 
     try {
-      if (!name || !description || !price || Sizes.length === 0) {
+      if (!name || !description || !price || !category || Sizes.length === 0) {
         toast.error("Please fill all required fields and select at least one size");
         setLoading(false);
         return;
@@ -213,9 +229,10 @@ const ADD = ({ token }) => {
           <div>
             <label style={{ display: "block", fontWeight: "600", fontSize: "13px", color: "#374151", marginBottom: "8px" }}>Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value)} style={selectStyle}>
-              <option value="Men">Men</option>
-              <option value="Women">Women</option>
-              <option value="Kids">Kids</option>
+              {categories.length === 0 && <option value="">No categories available</option>}
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>{cat.name}</option>
+              ))}
             </select>
           </div>
           <div>
