@@ -48,9 +48,17 @@ const AppContent = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="colored"
+        limit={3}
         style={{ zIndex: 10001 }}
-        toastStyle={{ marginTop: "120px" }}
+        toastStyle={{ 
+          marginTop: "120px", 
+          borderRadius: "14px", 
+          padding: "14px 20px",
+          fontSize: "14px",
+          fontWeight: "500",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+        }}
       />
       <Nav />
       <PromoBanner />
