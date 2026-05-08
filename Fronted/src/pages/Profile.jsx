@@ -79,7 +79,8 @@ const Profile = () => {
             state: "",
             zipcode: "",
             country: ""
-          }
+          },
+          addresses: user.addresses || []
         });
         
         setFormData({
@@ -509,183 +510,318 @@ const Profile = () => {
                   <h4 style={{ fontSize: "18px", fontWeight: "700", color: "#1f2937", margin: 0 }}>
                     📍 Delivery Address
                   </h4>
-                  {!isEditing && (
-                    <motion.button
-                      onClick={() => setIsEditing(true)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{
-                        backgroundColor: "#ff6f61",
-                        color: "#fff",
-                        border: "none",
-                        padding: "10px 24px",
-                        borderRadius: "12px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
-                      }}
-                    >
-                      ✏️ Edit Address
-                    </motion.button>
-                  )}
+                  <motion.button
+                    onClick={() => {
+                      setAddressForm({ label: "Home", street: "", city: "", state: "", zipcode: "", country: "India", phone: "", isDefault: false });
+                      setEditingAddressId(null);
+                      setShowAddressModal(true);
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      backgroundColor: "#ff6f61",
+                      color: "#fff",
+                      border: "none",
+                      padding: "10px 24px",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
+                    }}
+                  >
+                    + Add New
+                  </motion.button>
                 </div>
 
-                {/* Address Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  style={{
-                    background: "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)",
-                    borderRadius: "16px",
-                    padding: "24px",
-                    border: "2px solid #bbf7d0",
-                    marginBottom: "20px"
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{
-                      width: "44px",
-                      height: "44px",
-                      borderRadius: "12px",
-                      background: "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}>
-                      <span style={{ fontSize: "20px" }}>🏠</span>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      {isEditing ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {/* Address List */}
+                {(!userData.addresses || userData.addresses.length === 0) ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      background: "#f9fafb",
+                      borderRadius: "16px",
+                      border: "2px dashed #e5e7eb",
+                    }}
+                  >
+                    <span style={{ fontSize: "40px" }}>📍</span>
+                    <p style={{ color: "#6b7280", marginTop: "12px", fontSize: "14px" }}>
+                      No saved addresses yet. Click "Add New" to add one.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {userData.addresses.map((addr) => (
+                      <motion.div
+                        key={addr._id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{
+                          background: addr.isDefault ? "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)" : "#fff",
+                          borderRadius: "16px",
+                          padding: "20px",
+                          border: `2px solid ${addr.isDefault ? "#bbf7d0" : "#e5e7eb"}`,
+                          position: "relative",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
+                          <div style={{
+                            width: "44px", height: "44px", borderRadius: "12px",
+                            background: addr.label === "Office" ? "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)" :
+                              addr.label === "Other" ? "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)" :
+                              "linear-gradient(135deg, #10b981 0%, #34d399 100%)",
+                            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                          }}>
+                            <span style={{ fontSize: "20px" }}>
+                              {addr.label === "Office" ? "🏢" : addr.label === "Other" ? "📍" : "🏠"}
+                            </span>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "4px" }}>
+                              <span style={{ fontWeight: "700", fontSize: "15px", color: "#1f2937" }}>
+                                {addr.label || "Home"}
+                              </span>
+                              {addr.isDefault && (
+                                <span style={{ fontSize: "11px", background: "#10b981", color: "#fff", padding: "2px 10px", borderRadius: "4px", fontWeight: "600" }}>
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ margin: "2px 0", fontSize: "14px", color: "#374151" }}>
+                              {addr.street}, {addr.city}, {addr.state} - {addr.zipcode}
+                            </p>
+                            {addr.phone && (
+                              <p style={{ margin: "2px 0", fontSize: "13px", color: "#6b7280" }}>
+                                📞 {addr.phone}
+                              </p>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                            <motion.button
+                              onClick={() => {
+                                setAddressForm({ ...addr });
+                                setEditingAddressId(addr._id);
+                                setShowAddressModal(true);
+                              }}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              style={{
+                                background: "#f3f4f6", border: "none", borderRadius: "8px",
+                                padding: "8px", cursor: "pointer", fontSize: "14px",
+                              }}
+                              title="Edit"
+                            >
+                              ✏️
+                            </motion.button>
+                            <motion.button
+                              onClick={async () => {
+                                if (!confirm("Delete this address?")) return;
+                                try {
+                                  const delRes = await axios.delete(`${backendUrl}/api/user/address/${addr._id}`, { headers: { token } });
+                                  toast.success("Address deleted");
+                                  if (delRes.data.addresses) {
+                                    setUserData(prev => ({ ...prev, addresses: delRes.data.addresses }));
+                                  } else {
+                                    loadUserData();
+                                  }
+                                } catch (err) {
+                                  toast.error("Failed to delete address");
+                                }
+                              }}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              style={{
+                                background: "#fee2e2", border: "none", borderRadius: "8px",
+                                padding: "8px", cursor: "pointer", fontSize: "14px",
+                              }}
+                              title="Delete"
+                            >
+                              🗑️
+                            </motion.button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add/Edit Address Modal */}
+                <AnimatePresence>
+                  {showAddressModal && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      style={{
+                        position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        zIndex: 1000, padding: "20px",
+                      }}
+                      onClick={() => setShowAddressModal(false)}
+                    >
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          background: "#fff", borderRadius: "20px", padding: "32px",
+                          maxWidth: "520px", width: "100%", maxHeight: "90vh", overflowY: "auto",
+                          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+                          <h4 style={{ margin: 0, fontSize: "20px", fontWeight: "700", color: "#1f2937" }}>
+                            {editingAddressId ? "Edit Address" : "Add New Address"}
+                          </h4>
+                          <span onClick={() => setShowAddressModal(false)} style={{ cursor: "pointer", fontSize: "24px", color: "#9ca3af", lineHeight: 1 }}>×</span>
+                        </div>
+
+                        {/* Label */}
+                        <div style={{ marginBottom: "16px" }}>
+                          <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Address Label</label>
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            {["Home", "Office", "Other"].map(lbl => (
+                              <motion.div
+                                key={lbl}
+                                onClick={() => setAddressForm(prev => ({ ...prev, label: lbl }))}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                style={{
+                                  flex: 1, padding: "12px", borderRadius: "10px", cursor: "pointer",
+                                  textAlign: "center", fontWeight: "600", fontSize: "13px",
+                                  border: `2px solid ${addressForm.label === lbl ? "#ff6f61" : "#e5e7eb"}`,
+                                  background: addressForm.label === lbl ? "rgba(255,111,97,0.06)" : "#fff",
+                                  color: addressForm.label === lbl ? "#ff6f61" : "#6b7280",
+                                  transition: "all 0.2s ease",
+                                }}
+                              >
+                                {lbl === "Home" ? "🏠 " : lbl === "Office" ? "🏢 " : "📍 "}{lbl}
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: "16px" }}>
+                          <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Street Address *</label>
+                          <input type="text" placeholder="House No, Building, Street"
+                            value={addressForm.street}
+                            onChange={(e) => setAddressForm(prev => ({ ...prev, street: e.target.value }))}
+                            style={inputStyle}
+                          />
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
                           <div>
-                            <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Street Address</label>
-                            <motion.input
-                              type="text"
-                              name="street"
-                              value={formData.street}
-                              onChange={handleInputChange}
-                              placeholder="House No, Building, Street"
+                            <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>City *</label>
+                            <input type="text" placeholder="City"
+                              value={addressForm.city}
+                              onChange={(e) => setAddressForm(prev => ({ ...prev, city: e.target.value }))}
                               style={inputStyle}
-                              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                             />
                           </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                            <div>
-                              <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>City</label>
-                              <motion.input
-                                type="text"
-                                name="city"
-                                value={formData.city}
-                                onChange={handleInputChange}
-                                placeholder="City"
-                                style={inputStyle}
-                                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-                              />
-                            </div>
-                            <div>
-                              <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>State</label>
-                              <motion.input
-                                type="text"
-                                name="state"
-                                value={formData.state}
-                                onChange={handleInputChange}
-                                placeholder="State"
-                                style={inputStyle}
-                                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-                              />
-                            </div>
-                          </div>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                            <div>
-                              <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Pin Code</label>
-                              <motion.input
-                                type="text"
-                                name="zipcode"
-                                value={formData.zipcode}
-                                onChange={handleInputChange}
-                                placeholder="Pin Code"
-                                style={inputStyle}
-                                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-                              />
-                            </div>
-                            <div>
-                              <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Country</label>
-                              <motion.input
-                                type="text"
-                                name="country"
-                                value={formData.country}
-                                onChange={handleInputChange}
-                                placeholder="Country"
-                                style={inputStyle}
-                                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-                              />
-                            </div>
+                          <div>
+                            <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>State *</label>
+                            <input type="text" placeholder="State"
+                              value={addressForm.state}
+                              onChange={(e) => setAddressForm(prev => ({ ...prev, state: e.target.value }))}
+                              style={inputStyle}
+                            />
                           </div>
                         </div>
-                      ) : (
-                        <div>
-                          <p style={{ fontSize: "15px", color: "#1f2937", fontWeight: "600", marginBottom: "4px" }}>
-                            {userData.address.street || "Street not provided"}
-                          </p>
-                          <p style={{ fontSize: "14px", color: "#374151", marginBottom: "2px" }}>
-                            {[userData.address.city, userData.address.state].filter(Boolean).join(", ") || "City/State not provided"}
-                          </p>
-                          <p style={{ fontSize: "14px", color: "#374151", marginBottom: "2px" }}>
-                            {[userData.address.zipcode, userData.address.country].filter(Boolean).join(", ") || "Pin/Country not provided"}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
 
-                {/* Save/Cancel for Address Edit */}
-                {isEditing && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}
-                  >
-                    <motion.button
-                      onClick={handleSave}
-                      disabled={saving}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        backgroundColor: saving ? "#10b981" : "#ff6f61",
-                        color: "#fff",
-                        border: "none",
-                        padding: "14px 32px",
-                        borderRadius: "12px",
-                        fontSize: "14px",
-                        fontWeight: "700",
-                        cursor: saving ? "default" : "pointer",
-                        boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
-                      }}
-                    >
-                      {saving ? "Saving..." : "💾 Save Address"}
-                    </motion.button>
-                    <motion.button
-                      onClick={handleCancel}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        backgroundColor: "#fff",
-                        color: "#6b7280",
-                        border: "2px solid #e5e7eb",
-                        padding: "14px 32px",
-                        borderRadius: "12px",
-                        fontSize: "14px",
-                        fontWeight: "700",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Cancel
-                    </motion.button>
-                  </motion.div>
-                )}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                          <div>
+                            <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Pin Code *</label>
+                            <input type="text" placeholder="Pin Code"
+                              value={addressForm.zipcode}
+                              onChange={(e) => setAddressForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                              style={inputStyle}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Country</label>
+                            <input type="text" placeholder="Country"
+                              value={addressForm.country}
+                              onChange={(e) => setAddressForm(prev => ({ ...prev, country: e.target.value }))}
+                              style={inputStyle}
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: "16px" }}>
+                          <label style={{ fontSize: "13px", fontWeight: "600", color: "#374151", display: "block", marginBottom: "6px" }}>Mobile Number</label>
+                          <input type="tel" placeholder="Mobile Number"
+                            value={addressForm.phone}
+                            onChange={(e) => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
+                            style={inputStyle}
+                          />
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
+                          <input type="checkbox" id="isDefault"
+                            checked={addressForm.isDefault}
+                            onChange={(e) => setAddressForm(prev => ({ ...prev, isDefault: e.target.checked }))}
+                            style={{ width: "20px", height: "20px", accentColor: "#ff6f61", cursor: "pointer" }}
+                          />
+                          <label htmlFor="isDefault" style={{ fontSize: "14px", color: "#374151", cursor: "pointer", fontWeight: "500" }}>
+                            Set as default address
+                          </label>
+                        </div>
+
+                        <div style={{ display: "flex", gap: "12px" }}>
+                          <motion.button
+                            onClick={async () => {
+                              if (!addressForm.street || !addressForm.city || !addressForm.state || !addressForm.zipcode) {
+                                toast.error("Street, city, state and pin code are required");
+                                return;
+                              }
+                              try {
+                                let res;
+                                if (editingAddressId) {
+                                  res = await axios.put(`${backendUrl}/api/user/address/${editingAddressId}`, addressForm, { headers: { token } });
+                                } else {
+                                  res = await axios.post(`${backendUrl}/api/user/address`, addressForm, { headers: { token } });
+                                }
+                                if (res.data.success) {
+                                  toast.success(editingAddressId ? "Address updated!" : "Address added!");
+                                  setShowAddressModal(false);
+                                  setUserData(prev => ({ ...prev, addresses: res.data.addresses }));
+                                }
+                              } catch (err) {
+                                toast.error(err.response?.data?.message || "Failed to save address");
+                              }
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            style={{
+                              flex: 1, padding: "14px", background: "#ff6f61", color: "#fff",
+                              border: "none", borderRadius: "12px", fontWeight: "700", fontSize: "14px",
+                              cursor: "pointer", boxShadow: "0 4px 15px rgba(255,111,97,0.3)",
+                            }}
+                          >
+                            {editingAddressId ? "💾 Update Address" : "💾 Save Address"}
+                          </motion.button>
+                          <motion.button
+                            onClick={() => setShowAddressModal(false)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            style={{
+                              padding: "14px 24px", background: "#fff", color: "#6b7280",
+                              border: "2px solid #e5e7eb", borderRadius: "12px", fontWeight: "700", fontSize: "14px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Cancel
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </>
             )}
 
