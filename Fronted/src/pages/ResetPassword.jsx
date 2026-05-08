@@ -13,6 +13,8 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { navigate, backendUrl } = useContext(Shopcontext);
 
   const onSubmitHandler = async (event) => {
@@ -189,32 +191,51 @@ const ResetPassword = () => {
                 animate={{ opacity: 1, y: 0 }}
                 style={{ position: "relative", width: "100%" }}
               >
-                <motion.input
-                  type="password"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  onFocus={() => setFocusedField("newPassword")}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  style={{
-                    width: "90%",
-                    padding: "14px 16px",
-                    fontSize: "14px",
-                    border: `2px solid ${focusedField === "newPassword" ? "#ff6f61" : "#d1d5db"}`,
-                    borderRadius: "12px",
-                    outline: "none",
-                    backgroundColor: "#f9fafb",
-                    color: "#1f2937",
-                    transition: "all 0.3s ease",
-                    boxShadow: focusedField === "newPassword" ? "0 0 0 3px rgba(255,111,97,0.1)" : "none",
-                  }}
-                  whileFocus={{
-                    borderColor: "#ff6f61",
-                    boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
-                    backgroundColor: "#fff"
-                  }}
-                />
+                <div style={{ position: "relative", width: "100%" }}>
+                  <motion.input
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onFocus={() => setFocusedField("newPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    style={{
+                      width: "80%",
+                      padding: "14px 16px",
+                      paddingRight: "48px",
+                      fontSize: "14px",
+                      border: `2px solid ${focusedField === "newPassword" ? "#ff6f61" : "#d1d5db"}`,
+                      borderRadius: "12px",
+                      outline: "none",
+                      backgroundColor: "#f9fafb",
+                      color: "#1f2937",
+                      transition: "all 0.3s ease",
+                      boxShadow: focusedField === "newPassword" ? "0 0 0 3px rgba(255,111,97,0.1)" : "none",
+                    }}
+                    whileFocus={{
+                      borderColor: "#ff6f61",
+                      boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
+                      backgroundColor: "#fff"
+                    }}
+                  />
+                  <span
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "14px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      fontSize: "18px",
+                      color: "#9ca3af",
+                      userSelect: "none",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {showNewPassword ? "🙈" : "👁️"}
+                  </span>
+                </div>
               </motion.div>
 
               <motion.div
@@ -223,32 +244,51 @@ const ResetPassword = () => {
                 transition={{ delay: 0.1 }}
                 style={{ position: "relative", width: "100%" }}
               >
-                <motion.input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onFocus={() => setFocusedField("confirmPassword")}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  style={{
-                    width: "90%",
-                    padding: "14px 16px",
-                    fontSize: "14px",
-                    border: `2px solid ${focusedField === "confirmPassword" ? "#ff6f61" : "#d1d5db"}`,
-                    borderRadius: "12px",
-                    outline: "none",
-                    backgroundColor: "#f9fafb",
-                    color: "#1f2937",
-                    transition: "all 0.3s ease",
-                    boxShadow: focusedField === "confirmPassword" ? "0 0 0 3px rgba(255,111,97,0.1)" : "none",
-                  }}
-                  whileFocus={{
-                    borderColor: "#ff6f61",
-                    boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
-                    backgroundColor: "#fff"
-                  }}
-                />
+                <div style={{ position: "relative", width: "100%" }}>
+                  <motion.input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onFocus={() => setFocusedField("confirmPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    style={{
+                      width: "80%",
+                      padding: "14px 16px",
+                      paddingRight: "48px",
+                      fontSize: "14px",
+                      border: `2px solid ${focusedField === "confirmPassword" ? "#ff6f61" : "#d1d5db"}`,
+                      borderRadius: "12px",
+                      outline: "none",
+                      backgroundColor: "#f9fafb",
+                      color: "#1f2937",
+                      transition: "all 0.3s ease",
+                      boxShadow: focusedField === "confirmPassword" ? "0 0 0 3px rgba(255,111,97,0.1)" : "none",
+                    }}
+                    whileFocus={{
+                      borderColor: "#ff6f61",
+                      boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
+                      backgroundColor: "#fff"
+                    }}
+                  />
+                  <span
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "14px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      fontSize: "18px",
+                      color: "#9ca3af",
+                      userSelect: "none",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {showConfirmPassword ? "🙈" : "👁️"}
+                  </span>
+                </div>
               </motion.div>
 
               <motion.button

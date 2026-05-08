@@ -14,6 +14,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -66,7 +67,7 @@ const Login = () => {
   const inputFields = [
     { id: "name", type: "text", placeholder: "Full Name", value: name, setter: setName, show: currentState === "Sign Up" },
     { id: "email", type: "email", placeholder: "Email Address", value: email, setter: setEmail },
-    { id: "password", type: "password", placeholder: "Password", value: password, setter: setPassword },
+    { id: "password", type: showPassword ? "text" : "password", placeholder: "Password", value: password, setter: setPassword, isPassword: true },
   ];
 
   return (
@@ -247,34 +248,55 @@ const Login = () => {
                     transition={{ delay: index * 0.1 }}
                     style={{ position: "relative", width: "100%" }}
                   >
-                    <motion.input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={field.value}
-                      onChange={(e) => field.setter(e.target.value)}
-                      onFocus={() => setFocusedField(field.id)}
-                      onBlur={() => setFocusedField(null)}
-                      required
-                      style={{
-                        width: "90%",
-                        padding: "14px 16px",
-                        fontSize: "14px",
-                        border: `2px solid ${focusedField === field.id ? "#ff6f61" : "#d1d5db"}`,
-                        borderRadius: "12px",
-                        outline: "none",
-                        backgroundColor: "#f9fafb",
-                        color: "#1f2937",
-                        transition: "all 0.3s ease",
-                        boxShadow: focusedField === field.id 
-                          ? "0 0 0 3px rgba(255,111,97,0.1)" 
-                          : "none",
-                      }}
-                      whileFocus={{ 
-                        borderColor: "#ff6f61",
-                        boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
-                        backgroundColor: "#fff"
-                      }}
-                    />
+                    <div style={{ position: "relative", width: "100%" }}>
+                      <motion.input
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        value={field.value}
+                        onChange={(e) => field.setter(e.target.value)}
+                        onFocus={() => setFocusedField(field.id)}
+                        onBlur={() => setFocusedField(null)}
+                        required
+                        style={{
+                          width: field.isPassword ? "80%" : "90%",
+                          padding: "14px 16px",
+                          paddingRight: field.isPassword ? "48px" : "16px",
+                          fontSize: "14px",
+                          border: `2px solid ${focusedField === field.id ? "#ff6f61" : "#d1d5db"}`,
+                          borderRadius: "12px",
+                          outline: "none",
+                          backgroundColor: "#f9fafb",
+                          color: "#1f2937",
+                          transition: "all 0.3s ease",
+                          boxShadow: focusedField === field.id 
+                            ? "0 0 0 3px rgba(255,111,97,0.1)" 
+                            : "none",
+                        }}
+                        whileFocus={{ 
+                          borderColor: "#ff6f61",
+                          boxShadow: "0 0 0 3px rgba(255,111,97,0.15)",
+                          backgroundColor: "#fff"
+                        }}
+                      />
+                      {field.isPassword && (
+                        <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          style={{
+                            position: "absolute",
+                            right: "14px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                            fontSize: "18px",
+                            color: "#9ca3af",
+                            userSelect: "none",
+                            lineHeight: 1,
+                          }}
+                        >
+                          {showPassword ? "🙈" : "👁️"}
+                        </span>
+                      )}
+                    </div>
                   </motion.div>
                 )
               ))}
