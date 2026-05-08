@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const OrderSuccess = () => {
   const { navigate } = useContext(Shopcontext);
-  const [countdown, setCountdown] = useState(4);
+  const [countdown, setCountdown] = useState(7);
 
   useEffect(() => {
     const timer = setInterval(() => {
