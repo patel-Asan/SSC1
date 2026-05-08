@@ -39,7 +39,7 @@ const AppContent = () => {
       }}
     >
       <ToastContainer 
-        position="bottom-right"
+        position="top-center"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop
@@ -49,6 +49,8 @@ const AppContent = () => {
         draggable
         pauseOnHover
         theme="light"
+        style={{ zIndex: 10001 }}
+        toastStyle={{ marginTop: "120px" }}
       />
       <Nav />
       <PromoBanner />

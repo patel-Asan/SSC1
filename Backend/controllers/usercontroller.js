@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/usermodel.js";
 import orderModel from "../models/orderModel.js";
 import reviewModel from "../models/reviewModel.js";
+import wishlistModel from "../models/wishlistmodel.js";
 import { notifyNewUser } from "./notificationcontroller.js";
 import { sendWelcomeEmail } from "./emailcontroller.js";
 
@@ -289,15 +290,15 @@ const getUserStats = async (req, res) => {
         const ordersCount = await orderModel.countDocuments({ userId: userIdString });
         const reviewsCount = await reviewModel.countDocuments({ userId });
 
-        const user = await userModel.findById(userId);
-        const wishlistCount = user?.wishlistData ? Object.keys(user.wishlistData).length : 0;
+        const wishlist = await wishlistModel.findOne({ userId });
+        const wishlistCount = wishlist?.products?.length || 0;
 
         const recentOrders = await orderModel.find({ userId: userIdString })
             .sort({ date: -1 })
             .limit(5);
 
         const totalSpent = await orderModel.aggregate([
-            { $match: { userId: userIdString, payment: true } },
+            { $match: { userId: userIdString, status: { $ne: "cancelled" } } },
             { $group: { _id: null, total: { $sum: "$amount" } } }
         ]);
 
