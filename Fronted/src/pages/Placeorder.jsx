@@ -47,6 +47,13 @@ const Placeorder = () => {
     phone: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const fieldLabels = {
+    firstName: "First name", lastName: "Last name", email: "Email",
+    street: "Street address", city: "City", state: "State",
+    zipcode: "Pincode", country: "Country", phone: "Mobile number"
+  };
+
   const fetchAddresses = async () => {
     try {
       const res = await axios.get(`${backendUrl}/api/user/profile`, { headers: { token } });
@@ -122,6 +129,9 @@ const Placeorder = () => {
     const name = event.target.name;
     const value = event.target.value;
     setFormData((data) => ({ ...data, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleApplyCoupon = async () => {
@@ -152,10 +162,14 @@ const Placeorder = () => {
     }
 
     const requiredFields = ['firstName', 'lastName', 'email', 'street', 'city', 'state', 'zipcode', 'country', 'phone'];
-    const missingFields = requiredFields.filter(field => !formData[field].trim());
-    
-    if (missingFields.length > 0) {
-      toast.error(`Please fill in all required fields`);
+    const newErrors = {};
+    requiredFields.forEach(field => {
+      if (!formData[field].trim()) {
+        newErrors[field] = `${fieldLabels[field]} is required`;
+      }
+    });
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -238,6 +252,11 @@ const Placeorder = () => {
     backgroundColor: "#fff",
     color: "#1f2937",
     fontFamily: "'Inter', sans-serif",
+  };
+
+  const errorStyle = {
+    color: "#ef4444", fontSize: "12px", marginTop: "4px",
+    fontWeight: "500", paddingLeft: "2px"
   };
 
   const paymentMethods = [
@@ -344,105 +363,132 @@ const Placeorder = () => {
           style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}
         >
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <motion.input
-              required
-              onChange={onChangeHandler}
-              name="firstName"
-              value={formData.firstName}
-              type="text"
-              placeholder="First Name"
-              style={{ ...inputStyle, flex: 1, minWidth: "200px" }}
-              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-            />
-            <motion.input
-              required
-              onChange={onChangeHandler}
-              name="lastName"
-              value={formData.lastName}
-              type="text"
-              placeholder="Last Name"
-              style={{ ...inputStyle, flex: 1, minWidth: "200px" }}
-              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-            />
+            <div style={{ flex: 1, minWidth: "200px", display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="firstName"
+                value={formData.firstName}
+                type="text"
+                placeholder="First Name"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.firstName && <span style={errorStyle}>{errors.firstName}</span>}
+            </div>
+            <div style={{ flex: 1, minWidth: "200px", display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="lastName"
+                value={formData.lastName}
+                type="text"
+                placeholder="Last Name"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.lastName && <span style={errorStyle}>{errors.lastName}</span>}
+            </div>
           </div>
 
-          <motion.input
-            required
-            onChange={onChangeHandler}
-            name="email"
-            value={formData.email}
-            type="email"
-            placeholder="Email Address"
-            style={inputStyle}
-            whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-          />
-          <motion.input
-            required
-            onChange={onChangeHandler}
-            name="street"
-            value={formData.street}
-            type="text"
-            placeholder="Street Address"
-            style={inputStyle}
-            whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-          />
-
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <motion.input
               required
               onChange={onChangeHandler}
-              name="city"
-              value={formData.city}
-              type="text"
-              placeholder="City"
-              style={{ ...inputStyle, flex: 1 }}
+              name="email"
+              value={formData.email}
+              type="email"
+              placeholder="Email Address"
+              style={inputStyle}
               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
             />
+            {errors.email && <span style={errorStyle}>{errors.email}</span>}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <motion.input
               required
               onChange={onChangeHandler}
-              name="state"
-              value={formData.state}
+              name="street"
+              value={formData.street}
               type="text"
-              placeholder="State"
-              style={{ ...inputStyle, flex: 1 }}
+              placeholder="Street Address"
+              style={inputStyle}
               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
             />
+            {errors.street && <span style={errorStyle}>{errors.street}</span>}
           </div>
 
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <motion.input
-              required
-              onChange={onChangeHandler}
-              name="zipcode"
-              value={formData.zipcode}
-              type="number"
-              placeholder="Pincode"
-              style={{ ...inputStyle, flex: 1 }}
-              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-            />
-            <motion.input
-              required
-              onChange={onChangeHandler}
-              name="country"
-              value={formData.country}
-              type="text"
-              placeholder="Country"
-              style={{ ...inputStyle, flex: 1 }}
-              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-            />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="city"
+                value={formData.city}
+                type="text"
+                placeholder="City"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.city && <span style={errorStyle}>{errors.city}</span>}
+            </div>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="state"
+                value={formData.state}
+                type="text"
+                placeholder="State"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.state && <span style={errorStyle}>{errors.state}</span>}
+            </div>
           </div>
 
-          <motion.input
-            required
-            onChange={onChangeHandler}
-            name="phone"
-            value={formData.phone}
-            type="tel"
-            placeholder="Mobile Number"
-            style={inputStyle}
-            whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
-          />
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="zipcode"
+                value={formData.zipcode}
+                type="number"
+                placeholder="Pincode"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.zipcode && <span style={errorStyle}>{errors.zipcode}</span>}
+            </div>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <motion.input
+                required
+                onChange={onChangeHandler}
+                name="country"
+                value={formData.country}
+                type="text"
+                placeholder="Country"
+                style={inputStyle}
+                whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+              />
+              {errors.country && <span style={errorStyle}>{errors.country}</span>}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <motion.input
+              required
+              onChange={onChangeHandler}
+              name="phone"
+              value={formData.phone}
+              type="tel"
+              placeholder="Mobile Number"
+              style={inputStyle}
+              whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
+            />
+            {errors.phone && <span style={errorStyle}>{errors.phone}</span>}
+          </div>
         </motion.div>
       </motion.div>
 

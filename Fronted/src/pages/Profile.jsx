@@ -24,6 +24,16 @@ const Profile = () => {
     phone: "",
     isDefault: false
   });
+
+  const [addressErrors, setAddressErrors] = useState({});
+  const addressFieldLabels = { street: "Street address", city: "City", state: "State", zipcode: "Pin code" };
+
+  const handleAddressChange = (field, value) => {
+    setAddressForm(prev => ({ ...prev, [field]: value }));
+    if (addressErrors[field]) {
+      setAddressErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
   
   const [userData, setUserData] = useState({
     name: "",
@@ -805,10 +815,11 @@ const Profile = () => {
                           <motion.input
                             type="text" placeholder="House No, Building, Street"
                             value={addressForm.street}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, street: e.target.value }))}
+                            onChange={(e) => handleAddressChange("street", e.target.value)}
                             style={inputStyle}
                             whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                           />
+                          {addressErrors.street && <span style={{ color: "#ef4444", fontSize: "12px", marginTop: "4px", fontWeight: "500", display: "block" }}>{addressErrors.street}</span>}
                         </div>
 
                         {/* City + State */}
@@ -827,10 +838,11 @@ const Profile = () => {
                             <motion.input
                               type="text" placeholder="e.g. Mumbai"
                               value={addressForm.city}
-                              onChange={(e) => setAddressForm(prev => ({ ...prev, city: e.target.value }))}
+                              onChange={(e) => handleAddressChange("city", e.target.value)}
                               style={inputStyle}
                               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                             />
+                            {addressErrors.city && <span style={{ color: "#ef4444", fontSize: "12px", marginTop: "4px", fontWeight: "500", display: "block" }}>{addressErrors.city}</span>}
                           </div>
                           <div>
                             <label style={{
@@ -842,10 +854,11 @@ const Profile = () => {
                             <motion.input
                               type="text" placeholder="e.g. Maharashtra"
                               value={addressForm.state}
-                              onChange={(e) => setAddressForm(prev => ({ ...prev, state: e.target.value }))}
+                              onChange={(e) => handleAddressChange("state", e.target.value)}
                               style={inputStyle}
                               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                             />
+                            {addressErrors.state && <span style={{ color: "#ef4444", fontSize: "12px", marginTop: "4px", fontWeight: "500", display: "block" }}>{addressErrors.state}</span>}
                           </div>
                         </div>
 
@@ -865,10 +878,11 @@ const Profile = () => {
                             <motion.input
                               type="text" placeholder="e.g. 400001"
                               value={addressForm.zipcode}
-                              onChange={(e) => setAddressForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                              onChange={(e) => handleAddressChange("zipcode", e.target.value)}
                               style={inputStyle}
                               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                             />
+                            {addressErrors.zipcode && <span style={{ color: "#ef4444", fontSize: "12px", marginTop: "4px", fontWeight: "500", display: "block" }}>{addressErrors.zipcode}</span>}
                           </div>
                           <div>
                             <label style={{
@@ -880,7 +894,7 @@ const Profile = () => {
                             <motion.input
                               type="text" placeholder="Country"
                               value={addressForm.country}
-                              onChange={(e) => setAddressForm(prev => ({ ...prev, country: e.target.value }))}
+                              onChange={(e) => handleAddressChange("country", e.target.value)}
                               style={inputStyle}
                               whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                             />
@@ -898,7 +912,7 @@ const Profile = () => {
                           <motion.input
                             type="tel" placeholder="+91 98765 43210"
                             value={addressForm.phone}
-                            onChange={(e) => setAddressForm(prev => ({ ...prev, phone: e.target.value }))}
+                            onChange={(e) => handleAddressChange("phone", e.target.value)}
                             style={inputStyle}
                             whileFocus={{ borderColor: "#ff6f61", boxShadow: "0 0 0 3px rgba(255,111,97,0.1)" }}
                           />
@@ -949,8 +963,15 @@ const Profile = () => {
                         }}>
                           <motion.button
                             onClick={async () => {
-                              if (!addressForm.street || !addressForm.city || !addressForm.state || !addressForm.zipcode) {
-                                toast.error("Street, city, state and pin code are required");
+                              const newAddrErrors = {};
+                              const addrRequired = ["street", "city", "state", "zipcode"];
+                              addrRequired.forEach(field => {
+                                if (!addressForm[field].trim()) {
+                                  newAddrErrors[field] = `${addressFieldLabels[field]} is required`;
+                                }
+                              });
+                              if (Object.keys(newAddrErrors).length > 0) {
+                                setAddressErrors(newAddrErrors);
                                 return;
                               }
                               try {
