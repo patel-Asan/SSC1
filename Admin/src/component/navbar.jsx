@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Bell, User, LogOut, Package, CheckCircle, XCircle, UserPlus, Trash2, Check, Menu, Shield } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -58,7 +59,20 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
     }
   };
 
-  const deleteNotification = async (id) => {
+  const deleteNotification = async (id, e) => {
+    if (e) e.stopPropagation();
+    const result = await Swal.fire({
+      title: 'Delete Notification?',
+      text: "Are you sure you want to delete this notification?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel'
+    });
+    if (!result.isConfirmed) return;
+
     try {
       const response = await fetch(`${backendUrl}/api/notification/delete/${id}`, {
         method: 'DELETE',
@@ -71,6 +85,7 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
         if (deletedNotif && !deletedNotif.isRead) {
           setUnreadCount(prev => Math.max(0, prev - 1));
         }
+        Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Notification deleted', timer: 1500, showConfirmButton: false });
       }
     } catch (error) {
       console.error("Failed to delete notification:", error);
@@ -370,7 +385,7 @@ const Navbar = ({ setToken, setSidebarOpen }) => {
                             {getRelativeTime(notification.createdAt)}
                           </span>
                           <button
-                            onClick={(e) => { e.stopPropagation(); deleteNotification(notification._id); }}
+                            onClick={(e) => deleteNotification(notification._id, e)}
                             style={{
                               padding: "3px", background: "transparent", border: "none",
                               cursor: "pointer", borderRadius: "4px", opacity: 0.4,

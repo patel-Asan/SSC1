@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Mail, Search, Trash2, Eye, Clock, CheckCircle, MessageSquare } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -49,7 +50,17 @@ const Messages = ({ token }) => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this message?")) return;
+        const result = await Swal.fire({
+            title: 'Delete Message?',
+            text: "Are you sure you want to delete this message?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
 
         try {
             const response = await fetch(`${backendUrl}/api/message/${id}`, {
@@ -58,7 +69,7 @@ const Messages = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success("Message deleted successfully");
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Message deleted successfully', timer: 2000, showConfirmButton: false });
                 fetchMessages();
             } else {
                 toast.error(data.message || "Failed to delete message");

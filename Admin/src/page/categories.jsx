@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Plus, Trash2, X, Tag, Edit2, Check, XCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -92,7 +93,17 @@ const Categories = ({ token }) => {
     };
 
     const handleDelete = async (categoryId) => {
-        if (!window.confirm("Are you sure you want to delete this category?")) return;
+        const result = await Swal.fire({
+            title: 'Delete Category?',
+            text: "Are you sure you want to delete this category?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
 
         try {
             const response = await fetch(`${backendUrl}/api/category/${categoryId}`, {
@@ -101,7 +112,7 @@ const Categories = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success("Category deleted successfully");
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Category deleted successfully', timer: 2000, showConfirmButton: false });
                 fetchCategories();
             } else {
                 toast.error(data.message || "Failed to delete category");

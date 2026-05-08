@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Users, Send, Trash2, RefreshCw, Search, X, Mail, Calendar } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -31,13 +32,23 @@ const Newsletter = ({ token }) => {
     };
 
     const handleRemoveSubscriber = async (id) => {
-        if (!confirm("Remove this subscriber?")) return;
+        const result = await Swal.fire({
+            title: 'Remove Subscriber?',
+            text: "Are you sure you want to remove this subscriber?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, remove!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
         try {
             const response = await axios.delete(`${backendUrl}/api/subscribe/${id}`, {
                 headers: { token }
             });
             if (response.data.success) {
-                toast.success("Subscriber removed");
+                Swal.fire({ icon: 'success', title: 'Removed!', text: 'Subscriber removed successfully', timer: 2000, showConfirmButton: false });
                 fetchSubscribers();
             }
         } catch (error) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { currency } from "../App";
 import { ToastContainer, toast } from "react-toastify";
 import apiService from "../services/api.js";
+import Swal from "sweetalert2";
 import { Search, Package, Grid, List as ListIcon, Trash2, RefreshCw, Edit3, Eye, Filter } from "lucide-react";
 
 const List = ({ token }) => {
@@ -52,10 +53,8 @@ const List = ({ token }) => {
   };
 
   const removeProduct = async (id, productName) => {
-    console.log("🗑️ Starting remove for:", productName, "ID:", id);
-    
     if (!token) {
-      alert("No authentication token. Please login again.");
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No authentication token. Please login again.', confirmButtonColor: '#ef4444' });
       return;
     }
     
@@ -71,19 +70,15 @@ const List = ({ token }) => {
       });
       
       const data = await response.json();
-      console.log("📝 Remove response:", data);
-      console.log("📊 Status:", response.status);
       
       if (response.ok && data.success) {
-        alert(`"${productName}" removed successfully!`);
-        // Refresh the list
+        Swal.fire({ icon: 'success', title: 'Deleted!', text: `"${productName}" removed successfully!`, timer: 2000, showConfirmButton: false });
         fetchList();
       } else {
-        alert(`Failed to remove: ${data.message || 'Unknown error'}`);
+        Swal.fire({ icon: 'error', title: 'Failed!', text: data.message || 'Unknown error', confirmButtonColor: '#ef4444' });
       }
     } catch (error) {
-      console.error("❌ Remove error:", error);
-      alert(`Error: ${error.message}`);
+      Swal.fire({ icon: 'error', title: 'Error!', text: error.message, confirmButtonColor: '#ef4444' });
     }
   };
 
@@ -578,10 +573,18 @@ const List = ({ token }) => {
                     <Edit3 size={16} /> Edit
                   </button>
                   <button
-                    onClick={() => {
-                      if (window.confirm(`Delete "${item.name}"?`)) {
-                        removeProduct(item._id, item.name);
-                      }
+                    onClick={async () => {
+                      const result = await Swal.fire({
+                        title: 'Delete Product?',
+                        text: `Are you sure you want to delete "${item.name}"?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel'
+                      });
+                      if (result.isConfirmed) removeProduct(item._id, item.name);
                     }}
                     style={{
                       flex: 1,
@@ -743,10 +746,18 @@ const List = ({ token }) => {
                           <Edit3 size={18} />
                         </button>
                         <button
-                          onClick={() => {
-                            if (window.confirm(`Delete "${item.name}"?`)) {
-                              removeProduct(item._id, item.name);
-                            }
+                          onClick={async () => {
+                            const result = await Swal.fire({
+                              title: 'Delete Product?',
+                              text: `Are you sure you want to delete "${item.name}"?`,
+                              icon: 'warning',
+                              showCancelButton: true,
+                              confirmButtonColor: '#ef4444',
+                              cancelButtonColor: '#6b7280',
+                              confirmButtonText: 'Yes, delete it!',
+                              cancelButtonText: 'Cancel'
+                            });
+                            if (result.isConfirmed) removeProduct(item._id, item.name);
                           }}
                           style={{
                             padding: "10px",

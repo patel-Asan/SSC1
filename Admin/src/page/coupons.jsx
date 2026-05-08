@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Plus, Trash2, X, Calendar, Percent, DollarSign, Check, XCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -81,7 +82,17 @@ const Coupons = ({ token }) => {
     };
 
     const handleDelete = async (couponId) => {
-        if (!window.confirm("Are you sure you want to delete this coupon?")) return;
+        const result = await Swal.fire({
+            title: 'Delete Coupon?',
+            text: "Are you sure you want to delete this coupon?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
 
         try {
             const response = await fetch(`${backendUrl}/api/coupon/${couponId}`, {
@@ -90,7 +101,7 @@ const Coupons = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success("Coupon deleted successfully");
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Coupon deleted successfully', timer: 2000, showConfirmButton: false });
                 fetchCoupons();
             } else {
                 toast.error(data.message || "Failed to delete coupon");

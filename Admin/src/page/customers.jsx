@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Search, User, Mail, Phone, DollarSign, ShoppingCart, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -33,7 +34,17 @@ const Customers = ({ token }) => {
     };
 
     const handleDelete = async (customerId) => {
-        if (!window.confirm("Are you sure you want to delete this customer?")) return;
+        const result = await Swal.fire({
+            title: 'Delete Customer?',
+            text: "Are you sure you want to delete this customer?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
 
         try {
             const response = await fetch(`${backendUrl}/api/customer/${customerId}`, {
@@ -42,7 +53,7 @@ const Customers = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success("Customer deleted successfully");
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Customer deleted successfully', timer: 2000, showConfirmButton: false });
                 fetchCustomers();
             } else {
                 toast.error(data.message || "Failed to delete customer");

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import { Search, Star, Trash2, User, Package, Calendar, Shield } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -30,7 +31,17 @@ const Reviews = ({ token }) => {
     };
 
     const handleDelete = async (reviewId) => {
-        if (!window.confirm("Are you sure you want to delete this review?")) return;
+        const result = await Swal.fire({
+            title: 'Delete Review?',
+            text: "Are you sure you want to delete this review?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+        if (!result.isConfirmed) return;
 
         try {
             const response = await fetch(`${backendUrl}/api/review/admin/${reviewId}`, {
@@ -39,7 +50,7 @@ const Reviews = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                toast.success("Review deleted successfully");
+                Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Review deleted successfully', timer: 2000, showConfirmButton: false });
                 fetchReviews();
             } else {
                 toast.error(data.message || "Failed to delete review");
