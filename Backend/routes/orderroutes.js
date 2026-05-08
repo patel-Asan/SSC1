@@ -7,7 +7,8 @@ import {
   userOrders,
   updateStatus,
   trackOrder,
-  getOrderByTrackingId
+  getOrderByTrackingId,
+  cancelOrder
 } from '../controllers/ordercontroller.js';
 
 import adminAuth from '../middleware/adminAuth.js';  // ✅ Fixed spacing and path
@@ -24,8 +25,9 @@ orderRouter.post('/place', verifyToken, placeOrder);
 orderRouter.post('/stripe', verifyToken, placeOrderStripe);
 orderRouter.post('/razorpay', verifyToken, placeOrderRazorpay);
 
-// ✅ User Route
+// ✅ User Routes
 orderRouter.post('/userorders', verifyToken, userOrders);
+orderRouter.post('/cancel', verifyToken, cancelOrder);
 
 // ✅ Order Tracking Routes
 orderRouter.get('/track/:orderId', verifyToken, trackOrder);

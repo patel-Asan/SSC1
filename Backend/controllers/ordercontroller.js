@@ -255,4 +255,40 @@ const getOrderByTrackingId = async (req, res) => {
 };
 
 
-export{placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, trackOrder, getOrderByTrackingId}
+// Cancel order by user (only when pending)
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+        const userId = req.user._id;
+
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: "Order ID is required" });
+        }
+
+        const order = await orderModel.findOne({ _id: orderId, userId });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        if (order.status !== 'pending') {
+            return res.status(400).json({ success: false, message: "Only pending orders can be cancelled" });
+        }
+
+        order.status = 'cancelled';
+        await order.save();
+
+        await notifyOrderCancelled({
+            orderId: order._id,
+            userId: userId,
+            amount: order.amount
+        });
+
+        res.json({ success: true, message: "Order cancelled successfully", order });
+    } catch (error) {
+        console.error("Cancel order error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export{placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, trackOrder, getOrderByTrackingId, cancelOrder}
