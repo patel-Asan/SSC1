@@ -1,6 +1,7 @@
 {
   "name": "SSC - Fashion Store",
   "short_name": "SSC App",
+  "description": "Shop the latest fashion trends at SSC",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -14,7 +15,8 @@
     {
       "src": "/icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
