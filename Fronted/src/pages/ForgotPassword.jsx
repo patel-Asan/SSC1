@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Shopcontext } from "../context/shopcontext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -9,7 +9,14 @@ const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { navigate, backendUrl } = useContext(Shopcontext);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -40,12 +47,13 @@ const ForgotPassword = () => {
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: isMobile ? "column" : "row",
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       }}
     >
       <div style={{
         flex: 1,
-        display: "flex",
+        display: isMobile ? "none" : "flex",
         flexDirection: "column",
         justifyContent: "center",
         padding: "60px 40px",
@@ -73,7 +81,7 @@ const ForgotPassword = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px 20px",
+        padding: isMobile ? "40px 16px" : "40px 20px",
         backgroundColor: "#fff",
       }}>
         <motion.div
@@ -83,7 +91,7 @@ const ForgotPassword = () => {
           style={{
             width: "100%",
             maxWidth: "420px",
-            padding: "40px",
+            padding: isMobile ? "24px" : "40px",
             borderRadius: "24px",
             backgroundColor: "#ffffff",
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
@@ -116,7 +124,7 @@ const ForgotPassword = () => {
             <motion.h2
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              style={{ fontSize: "32px", fontWeight: "700", color: "#111827", marginBottom: "8px" }}
+              style={{ fontSize: isMobile ? "24px" : "32px", fontWeight: "700", color: "#111827", marginBottom: "8px" }}
             >
               {sent ? "Check Your Email" : "Forgot Password?"}
             </motion.h2>
