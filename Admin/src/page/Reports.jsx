@@ -81,7 +81,10 @@ const Reports = ({ token }) => {
     };
 
     const formatDate = (ts) => {
-        return new Date(ts).toLocaleDateString('en-IN', {
+        if (!ts) return 'N/A';
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return 'N/A';
+        return d.toLocaleDateString('en-IN', {
             year: 'numeric', month: 'short', day: 'numeric'
         });
     };
@@ -111,9 +114,13 @@ const Reports = ({ token }) => {
                 `${item.name} × ${item.quantity}`
             ).join('; ') || '';
 
-            const discount = order.discount
-                ? `${order.discount}${order.couponCode ? ` (${order.couponCode})` : ''}`
-                : '0';
+            let discount = '0';
+            if (order.discount) {
+                discount = String(order.discount);
+                if (order.couponCode) {
+                    discount += ' (' + order.couponCode + ')';
+                }
+            }
 
             const city = order.address?.city || '';
 

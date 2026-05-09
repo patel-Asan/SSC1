@@ -1,4 +1,6 @@
 import couponModel from "../models/couponmodel.js";
+import subscriberModel from "../models/subscribermodel.js";
+import { sendEmail } from "./emailcontroller.js";
 
 // Create new coupon
 const createCoupon = async (req, res) => {
@@ -24,6 +26,45 @@ const createCoupon = async (req, res) => {
         });
 
         await coupon.save();
+
+        // Send coupon notification to all active subscribers
+        try {
+            const activeSubscribers = await subscriberModel.find({ status: 'active' });
+            const discountText = coupon.discountType === 'percentage'
+                ? coupon.discountValue + '% OFF'
+                : '₹' + coupon.discountValue + ' OFF';
+            const minOrderText = coupon.minOrderAmount > 0 ? ' | Min order: ₹' + coupon.minOrderAmount : '';
+            const usageText = coupon.usageLimit ? 'Limited to ' + coupon.usageLimit + ' uses' : 'Unlimited uses';
+
+            for (const sub of activeSubscribers) {
+                try {
+                    await sendEmail(sub.email,
+                        '🎉 New Coupon: ' + coupon.code + ' - ' + discountText,
+                        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">' +
+                            '<div style="background: linear-gradient(135deg, #8b5cf6, #ff6f61); padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">' +
+                                '<h1 style="color: white; margin: 0; font-size: 28px;">🎉 New Offer!</h1>' +
+                                '<p style="color: rgba(255,255,255,0.9); font-size: 16px;">Exclusive coupon just for you</p>' +
+                            '</div>' +
+                            '<div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">' +
+                                '<p style="color: #1f2937; font-size: 16px;">Hi <strong>' + sub.name + '</strong>,</p>' +
+                                '<p style="color: #6b7280; line-height: 1.6;">Use the coupon below on your next order and save big!</p>' +
+                                '<div style="background: #f3f4f6; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">' +
+                                    '<p style="color: #6b7280; margin: 0 0 8px; font-size: 14px;">Your Coupon Code:</p>' +
+                                    '<p style="font-size: 32px; font-weight: bold; color: #8b5cf6; margin: 0; letter-spacing: 3px;">' + coupon.code + '</p>' +
+                                    '<p style="color: #10b981; margin: 8px 0 0; font-weight: 600;">' + discountText + minOrderText + '</p>' +
+                                '</div>' +
+                                '<p style="color: #9ca3af; font-size: 13px;">Valid till ' + new Date(coupon.expiryDate).toLocaleDateString() + ' • ' + usageText + '</p>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                } catch (err) {
+                    console.error('Failed to send coupon email to ' + sub.email + ':', err);
+                }
+            }
+            console.log('Coupon ' + coupon.code + ' notification sent to ' + activeSubscribers.length + ' subscribers');
+        } catch (err) {
+            console.error("Failed to notify subscribers about coupon:", err);
+        }
 
         res.status(201).json({
             success: true,
