@@ -5,6 +5,10 @@ import App from './App.jsx'
 import{BrowserRouter} from 'react-router-dom'
 import ShopcontextProvider from './context/shopcontext.jsx'
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
+
 createRoot(document.getElementById('root')).render(
  <BrowserRouter>
  <ShopcontextProvider>
