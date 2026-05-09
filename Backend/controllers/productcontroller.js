@@ -7,7 +7,7 @@ import connectCloudinary from "../config/cloudinary.js";
 // Function to add a product
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
+        const { name, description, price, category, subCategory, sizes, bestseller, stock } = req.body;
 
         // Validate required fields
         if (!name || !description || !price || !category || !subCategory || !sizes) {
@@ -75,6 +75,7 @@ const addProduct = async (req, res) => {
             sizes: JSON.parse(sizes),
             image: imagesUrl,
             date: Date.now(),
+            stock: stock ? Number(stock) : 0,
         };
 
         const product = new productModel(productData);
@@ -214,7 +215,7 @@ const SingleProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
+        const { name, description, price, category, subCategory, sizes, bestseller, stock } = req.body;
 
         console.log("🔍 Update product request received");
         console.log("📝 Product ID:", id);
@@ -246,6 +247,7 @@ const updateProduct = async (req, res) => {
         if (subCategory) product.subCategory = subCategory;
         if (sizes) product.sizes = Array.isArray(sizes) ? sizes : JSON.parse(sizes);
         if (bestseller !== undefined) product.bestseller = bestseller;
+        if (stock !== undefined) product.stock = Number(stock);
 
         // Save the updated product
         await product.save();

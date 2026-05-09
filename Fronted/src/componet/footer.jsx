@@ -370,7 +370,7 @@ const Footer = () => {
             color: "#6b7280",
             margin: 0,
           }}>
-            © 2024 <span style={{ color: "#ff6f61", fontWeight: "600" }}>Surat Sari Centre</span>. All Rights Reserved.
+            © 2026 <span style={{ color: "#ff6f61", fontWeight: "600" }}>Surat Sari Centre</span>. All Rights Reserved.
           </p>
           <div style={{ display: "flex", gap: "24px" }}>
             {footerLinks.legal.map((link, i) => (

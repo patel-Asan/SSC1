@@ -489,7 +489,7 @@ const Categories = ({ token }) => {
                                     required
                                     placeholder="e.g., Electronics"
                                     style={{
-                                        width: "100%",
+                                        width: "90%",
                                         padding: "12px 16px",
                                         borderRadius: "10px",
                                         border: "1px solid #e5e7eb",
@@ -517,7 +517,7 @@ const Categories = ({ token }) => {
                                     placeholder="Category description..."
                                     rows="3"
                                     style={{
-                                        width: "100%",
+                                        width: "90%",
                                         padding: "12px 16px",
                                         borderRadius: "10px",
                                         border: "1px solid #e5e7eb",

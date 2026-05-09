@@ -28,7 +28,7 @@ const Coupons = ({ token }) => {
             });
             const data = await response.json();
             if (data.success) {
-                setCoupons(data.coupons);
+                setCoupons(data.coupons.filter(c => !c.code.startsWith('WELCOME-')));
             } else {
                 toast.error(data.message || "Failed to fetch coupons");
             }

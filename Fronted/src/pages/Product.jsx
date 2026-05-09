@@ -21,7 +21,7 @@ const Product = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
-  const [stockCount, setStockCount] = useState(15);
+  const [stockCount, setStockCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   
@@ -56,6 +56,7 @@ const Product = () => {
         const firstImage = normalizedProduct.image[0];
         setImage(firstImage);
         setIsWishlisted(isInWishlist(foundProduct._id));
+        setStockCount(normalizedProduct.stock || 0);
       }
     };
     

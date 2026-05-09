@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import { LogIn, Mail, Lock, Eye, EyeOff, Shield } from "lucide-react";
 import apiService from "../services/api.js";
+import logo from "../assets/logotitle.png";
 
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
@@ -77,17 +78,18 @@ const Login = ({ setToken }) => {
           marginBottom: "24px"
         }}>
           <div style={{
-            width: "64px",
-            height: "64px",
+            width: "127px",
+            height: "127px",
             borderRadius: "16px",
-            background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
+            // background: "linear-gradient(135deg, #8b5cf6 0%, #ff6f61 100%)",
+            background: "aquamarine",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 12px",
             boxShadow: "0 4px 20px rgba(139,92,246,0.25)"
           }}>
-            <Shield size={32} color="white" />
+            <img src={logo} alt="SSC Logo" style={{ width: "125px", height: "125px" }} />  
           </div>
           <h1 style={{
             fontSize: "clamp(24px, 5vw, 28px)",
@@ -298,38 +300,6 @@ const Login = ({ setToken }) => {
               )}
             </button>
           </form>
-
-          {/* Credentials Hint */}
-          <div style={{
-            marginTop: "20px",
-            padding: "12px",
-            background: "rgba(255,255,255,0.06)",
-            borderRadius: "10px",
-            border: "1px solid rgba(255,255,255,0.08)"
-          }}>
-            <p style={{
-              margin: "0 0 6px 0",
-              fontSize: "10px",
-              color: "rgba(255,255,255,0.35)",
-              fontWeight: "500",
-              textTransform: "uppercase",
-              letterSpacing: "0.8px",
-              textAlign: "center"
-            }}>
-              Demo Credentials
-            </p>
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "3px",
-              fontSize: "12px",
-              color: "rgba(255,255,255,0.5)",
-              textAlign: "center"
-            }}>
-              <span>Email: <strong style={{ color: "rgba(255,255,255,0.8)" }}>adminssc@gmail.com</strong></span>
-              <span>Password: <strong style={{ color: "rgba(255,255,255,0.8)" }}>ssc112233</strong></span>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

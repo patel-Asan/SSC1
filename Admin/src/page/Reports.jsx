@@ -80,24 +80,65 @@ const Reports = ({ token }) => {
         });
     };
 
+    const formatDate = (ts) => {
+        return new Date(ts).toLocaleDateString('en-IN', {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
+    };
+
     const exportCSV = () => {
         if (!reportData) return;
-        const headers = ['Date', 'Order ID', 'Amount', 'Status', 'Payment Method'];
-        const rows = orders.map(order => [
-            new Date(order.date).toLocaleDateString(),
-            order._id?.slice(-8),
-            order.amount,
-            order.status,
-            order.paymentMethod
-        ]);
-        
-        const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+
+        const now = new Date();
+        const startDate = new Date(now.getTime() - dateRange * 24 * 60 * 60 * 1000);
+        const filteredOrders = orders.filter(o => new Date(o.date) >= startDate);
+
+        const headers = [
+            'Date',
+            'Order ID',
+            'Customer Name',
+            'Customer Email',
+            'Items (Product × Qty)',
+            'Amount',
+            'Discount/Coupon',
+            'Payment Method',
+            'Status',
+            'Address (City)'
+        ];
+
+        const rows = filteredOrders.map(order => {
+            const items = order.items?.map(item =>
+                `${item.name} × ${item.quantity}`
+            ).join('; ') || '';
+
+            const discount = order.discount
+                ? `${order.discount}${order.couponCode ? ` (${order.couponCode})` : ''}`
+                : '0';
+
+            const city = order.address?.city || '';
+
+            return [
+                formatDate(order.date),
+                order._id,
+                order.customerName || 'Unknown',
+                order.customerEmail || 'Unknown',
+                `"${items}"`,
+                order.amount || 0,
+                discount,
+                order.paymentMethod || 'N/A',
+                order.status || 'N/A',
+                `"${city}"`
+            ].join(',');
+        });
+
+        const csvContent = '\uFEFF' + headers.join(',') + '\n' + rows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `sales-report-${dateRange}days.csv`;
+        a.download = `revenue-report-${dateRange}days.csv`;
         a.click();
+        URL.revokeObjectURL(url);
         toast.success("Report exported successfully!");
     };
 

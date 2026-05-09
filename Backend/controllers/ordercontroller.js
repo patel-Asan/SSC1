@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js"
 import userModel from "../models/usermodel.js"
+import productModel from "../models/productmodel.js"
 import { notifyNewOrder, notifyOrderCancelled, notifyOrderDelivered } from "./notificationcontroller.js"
 import { incrementCouponUsage } from "./couponcontroller.js"
 import { sendOrderConfirmationEmail, sendOrderStatusEmail } from "./emailcontroller.js"
@@ -37,6 +38,13 @@ const placeOrder = async (req,res) => {
 
         const newOrder = new orderModel(orderData)
         await newOrder.save()
+
+        // Decrement stock for each item in the order
+        for (const item of items) {
+            await productModel.findByIdAndUpdate(item._id, {
+                $inc: { stock: -item.quantity }
+            });
+        }
 
         // Create notification for new order
         await notifyNewOrder({
@@ -81,8 +89,22 @@ const placeOrderRazorpay = async (req,res) => {
 // All Orders data for Admin Panel
 const allOrders = async (req,res) => {
  try{
-    const orders = await orderModel.find({})
-    res.json({success:true,orders})
+    const orders = await orderModel.find({}).sort({ date: -1 })
+
+    const enrichedOrders = await Promise.all(orders.map(async (order) => {
+      const orderObj = order.toObject()
+      try {
+        const user = await userModel.findById(orderObj.userId)
+        orderObj.customerName = user?.name || 'Unknown'
+        orderObj.customerEmail = user?.email || 'Unknown'
+      } catch {
+        orderObj.customerName = 'Unknown'
+        orderObj.customerEmail = 'Unknown'
+      }
+      return orderObj
+    }))
+
+    res.json({success:true, orders: enrichedOrders})
  }catch (error){
  console.log(error)
  res.json({success:false,message:error.message}) 

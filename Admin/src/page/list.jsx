@@ -25,7 +25,8 @@ const List = ({ token }) => {
     category: "",
     subCategory: "",
     sizes: [],
-    bestseller: false
+    bestseller: false,
+    stock: ""
   });
   const [updating, setUpdating] = useState(false);
 
@@ -98,7 +99,8 @@ const List = ({ token }) => {
       category: product.category || "",
       subCategory: product.subCategory || "",
       sizes: product.sizes || [],
-      bestseller: product.bestseller || false
+      bestseller: product.bestseller || false,
+      stock: product.stock ?? ""
     });
     setEditModalOpen(true);
   };
@@ -1333,6 +1335,31 @@ const List = ({ token }) => {
                     resize: "vertical",
                     transition: "border-color 0.3s ease",
                     fontFamily: "inherit"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                  onBlur={(e) => e.target.style.borderColor = "#e5e7eb"}
+                />
+              </div>
+
+              {/* Stock */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "600", color: "#374151" }}>
+                  Stock Quantity
+                </label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={editFormData.stock}
+                  onChange={handleEditChange}
+                  min="0"
+                  style={{
+                    width: "100%",
+                    padding: "14px",
+                    borderRadius: "12px",
+                    border: "2px solid #e5e7eb",
+                    fontSize: "15px",
+                    outline: "none",
+                    transition: "border-color 0.3s ease"
                   }}
                   onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
                   onBlur={(e) => e.target.style.borderColor = "#e5e7eb"}
