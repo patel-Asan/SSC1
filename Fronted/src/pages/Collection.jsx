@@ -19,11 +19,39 @@ const Collection = () => {
   const [showOnSale, setShowOnSale] = useState(false);
   const [showBestseller, setShowBestseller] = useState(false);
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [types, setTypes] = useState([]);
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
   // Fetch products when component mounts (page reload)
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Fetch active categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/category/active`);
+        const data = await res.json();
+        if (data.success) {
+          setCategories(data.categories);
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Extract unique subCategory values from products
+  useEffect(() => {
+    if (products.length > 0) {
+      const unique = [...new Set(products.map(p => p.subCategory).filter(Boolean))];
+      setTypes(unique);
+    }
+  }, [products]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -268,27 +296,30 @@ const Collection = () => {
                 transition={{ duration: 0.3 }}
                 style={{ overflow: "hidden", width: "100%" }}
               >
+                {categories.length > 0 && (
                 <div style={{ marginBottom: "20px" }}>
                   <p style={{ marginBottom: "10px", fontSize: "13px", fontWeight: "700", color: "#374151" }}>CATEGORIES</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {["Men", "Women", "Kids"].map((cat) => (
-                      <label key={cat} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", color: "#374151" }}>
+                    {categories.map((cat) => (
+                      <label key={cat._id} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", color: "#374151" }}>
                         <input 
                           type="checkbox" 
-                          value={cat} 
+                          value={cat.name}
                           onChange={toggleCategory}
                           style={{ cursor: "pointer", width: "16px", height: "16px", accentColor: "#ff6f61" }}
                         />
-                        {cat}
+                        {cat.name}
                       </label>
                     ))}
                   </div>
                 </div>
+                )}
 
+                {types.length > 0 && (
                 <div style={{ marginBottom: "20px" }}>
                   <p style={{ marginBottom: "10px", fontSize: "13px", fontWeight: "700", color: "#374151" }}>TYPE</p>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {["Topwear", "Bottomwear", "Winterwear"].map((type) => (
+                    {types.map((type) => (
                       <label key={type} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", color: "#374151" }}>
                         <input 
                           type="checkbox" 
@@ -301,6 +332,7 @@ const Collection = () => {
                     ))}
                   </div>
                 </div>
+                )}
 
                 <div style={{ marginBottom: "20px" }}>
                   <p style={{ marginBottom: "10px", fontSize: "13px", fontWeight: "700", color: "#374151" }}>PRICE RANGE</p>
