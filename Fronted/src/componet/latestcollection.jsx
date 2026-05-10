@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Shopcontext } from "../context/shopcontext";
+import { useNavigate } from "react-router-dom";
 import Title from "./title";
 import Productitem from "./productitem";
 import ProductSkeleton from "./ProductSkeleton";
@@ -7,6 +8,7 @@ import { motion } from "framer-motion";
 
 const Latestcollection = () => {
   const { products, loading, error } = useContext(Shopcontext);
+  const navigate = useNavigate();
   const [latestproducts, setlatestproducts] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -304,6 +306,7 @@ const Latestcollection = () => {
         style={{ textAlign: "center", marginTop: "70px", position: "relative", zIndex: 1 }}
       >
         <motion.button
+          onClick={() => navigate("/collection")}
           whileHover={{ 
             scale: 1.05, 
             boxShadow: "0 15px 35px rgba(255, 111, 97, 0.4)",
