@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
@@ -32,6 +33,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Middleware
+app.use(compression());
 app.use(express.json());
 app.use(cors({
   origin: '*',

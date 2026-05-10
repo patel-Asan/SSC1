@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, use } from "react";
+import { createContext, useState, useEffect, use, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -273,10 +273,16 @@ const ShopContextProvider = (props) => {
     toast.success("Wishlist cleared");
   };
 
-  const getCartAmount = () => {
+  const productsMap = useMemo(() => {
+    const map = new Map();
+    products.forEach(p => map.set(p._id, p));
+    return map;
+  }, [products]);
+
+  const getCartAmount = useCallback(() => {
     let total = 0;
     for (const id in cartItems) {
-      const product = products.find((p) => p._id === id);
+      const product = productsMap.get(id);
       if (product) {
         for (const size in cartItems[id]) {
           total += product.price * cartItems[id][size];
@@ -284,9 +290,9 @@ const ShopContextProvider = (props) => {
       }
     }
     return total;
-  };
+  }, [cartItems, productsMap]);
 
-  const getCartCount = () => {
+  const getCartCount = useCallback(() => {
     let count = 0;
     for (const id in cartItems) {
       for (const size in cartItems[id]) {
@@ -294,18 +300,19 @@ const ShopContextProvider = (props) => {
       }
     }
     return count;
-  };
+  }, [cartItems]);
 
-  const getProductById = (id) => products.find(p => p._id === id);
+  const getProductById = useCallback((id) => productsMap.get(id), [productsMap]);
 
-  const getFilteredProducts = () => {
+  const getFilteredProducts = useCallback(() => {
     if (!search.trim()) return products;
+    const term = search.toLowerCase();
     return products.filter(p =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase())
+      (p.name && p.name.toLowerCase().includes(term)) ||
+      (p.description && p.description.toLowerCase().includes(term)) ||
+      (p.category && p.category.toLowerCase().includes(term))
     );
-  };
+  }, [products, search]);
 
   const getUserCart = async (token) => {
     try {
@@ -404,8 +411,8 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  const getProductsByCategory = (cat) => products.filter(p => p.category === cat);
-  const getBestsellerProducts = () => products.filter(p => p.bestseller);
+  const getProductsByCategory = useCallback((cat) => products.filter(p => p.category === cat), [products]);
+  const getBestsellerProducts = useCallback(() => products.filter(p => p.bestseller), [products]);
 
   // Review API Functions
   const getProductReviews = async (productId) => {

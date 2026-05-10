@@ -1,19 +1,5 @@
-import React from "react"
+import React, { Suspense, lazy } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
-import Home from "./pages/Home";
-import Collection from "./pages/Collection";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Product from "./pages/Product";
-import Cart from "./pages/Cart";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Placeorder from "./pages/Placeorder";
-import Order from "./pages/order";
-import OrderSuccess from "./pages/OrderSuccess";
-import Profile from "./pages/Profile";
-import Wishlist from "./pages/Wishlist";
 import Nav from "./componet/nav";
 import Footer from "./componet/footer";
 import SearchBar from "./componet/searchbar";
@@ -22,6 +8,21 @@ import PromoBanner from "./componet/PromoBanner";
 import PageTransition from "./componet/PageTransition";
 import { ToastContainer } from 'react-toastify';
 import { AnimatePresence, motion } from "framer-motion";
+
+const Home = lazy(() => import("./pages/Home"));
+const Collection = lazy(() => import("./pages/Collection"));
+const Contact = lazy(() => import("./pages/Contact"));
+const About = lazy(() => import("./pages/About"));
+const Product = lazy(() => import("./pages/Product"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Placeorder = lazy(() => import("./pages/Placeorder"));
+const Order = lazy(() => import("./pages/order"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
 
 const AppContent = () => {
   const location = useLocation();
@@ -66,6 +67,16 @@ const AppContent = () => {
       
       <main style={{ minHeight: "calc(100vh - 300px)" }}>
         <AnimatePresence mode="wait">
+          <Suspense fallback={
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+              <div style={{
+                width: 40, height: 40, border: '4px solid #f3f4f6',
+                borderTop: '4px solid #ff6f61', borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }} />
+              <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+            </div>
+          }>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
             <Route path="/collection" element={<PageTransition><Collection /></PageTransition>} />
@@ -82,6 +93,7 @@ const AppContent = () => {
             <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
             <Route path="/wishlist" element={<PageTransition><Wishlist /></PageTransition>} />
           </Routes>
+          </Suspense>
         </AnimatePresence>
       </main>
       

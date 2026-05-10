@@ -1,10 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, memo } from "react";
 import { Shopcontext } from "../context/shopcontext";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
-const Productitem = ({ id, name, image, price, product }) => {
+const Productitem = memo(({ id, name, image, price, product }) => {
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, currency } = useContext(Shopcontext);
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
@@ -257,6 +257,6 @@ const Productitem = ({ id, name, image, price, product }) => {
       </div>
     </motion.div>
   );
-};
+});
 
 export default Productitem;
