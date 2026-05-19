@@ -35,8 +35,10 @@ const AppContent = () => {
       style={{
         maxWidth: "1600px",
         margin: "0 auto",
-        backgroundColor: "#fff",
+        background: "linear-gradient(180deg, #f8fbff 0%, #ffffff 40%, #f4f7ff 100%)",
         minHeight: "100vh",
+        overflowX: "hidden",
+        color: "#111827",
       }}
     >
       <ToastContainer 

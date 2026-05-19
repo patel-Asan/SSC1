@@ -46,7 +46,7 @@ const Hero = () => {
         minHeight: "100vh",
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "radial-gradient(circle at top right, rgba(255,255,255,0.15), transparent 25%),\n                    radial-gradient(circle at bottom left, rgba(255,111,97,0.17), transparent 20%),\n                    linear-gradient(135deg, #4f46e5 0%, #9333ea 45%, #ec4899 100%)",
         position: "relative",
       }}
     >
@@ -181,21 +181,21 @@ const Hero = () => {
           transition={{ delay: 0.6 }}
           whileHover={{ 
             scale: 1.05,
-            boxShadow: "0px 8px 30px rgba(255, 111, 97, 0.5)",
+            boxShadow: "0px 12px 36px rgba(255, 111, 97, 0.4)",
           }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/collection')}
           style={{
             display: "inline-block",
-            backgroundColor: "#ff6f61",
+            background: "linear-gradient(135deg, #ff7a6c 0%, #ffb199 100%)",
             color: "#fff",
-            padding: "18px 40px",
-            borderRadius: "16px",
+            padding: "18px 42px",
+            borderRadius: "20px",
             fontWeight: 700,
             fontSize: "16px",
             cursor: "pointer",
             border: "none",
-            boxShadow: "0px 4px 20px rgba(255, 111, 97, 0.3)",
+            boxShadow: "0px 10px 30px rgba(255, 111, 97, 0.28)",
             transition: "all 0.3s ease",
           }}
         >

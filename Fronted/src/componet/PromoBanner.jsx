@@ -35,15 +35,17 @@ const PromoBanner = () => {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -40, opacity: 0 }}
       style={{
-        background: "linear-gradient(135deg, #ff6f61 0%, #ff8a7a 100%)",
+        background: "linear-gradient(135deg, rgba(255,111,97,0.98) 0%, rgba(255,157,143,0.95) 100%)",
         color: "#fff",
-        padding: "12px 20px",
+        padding: "14px 24px",
         textAlign: "center",
         fontSize: "14px",
-        fontWeight: "500",
+        fontWeight: "600",
         position: "relative",
         zIndex: 10000,
         marginTop: "80px",
+        borderRadius: "0 0 24px 24px",
+        boxShadow: "0 24px 60px rgba(255,111,97,0.18)",
       }}
     >
       <AnimatePresence mode="wait">
